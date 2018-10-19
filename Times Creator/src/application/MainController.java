@@ -28,6 +28,12 @@ import javafx.stage.Stage;
 import util.Pair;
 import util.Shift;
 
+/**
+ * This controller contains FXML hooks into the MAIN_FXML file.
+ * It is responsible for all the actions done with the main window.
+ * @author colli
+ *
+ */
 public class MainController
 {
 	/**

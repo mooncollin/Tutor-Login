@@ -22,6 +22,12 @@ import tutorlogin.Tutor;
 import util.OSSettings;
 import util.Shift;
 
+/**
+ * This controller contains FXML hooks into the TUTOR_LOGIN_FXML file.
+ * It is responsible for all the actions done on the "tutor login" window.
+ * @author colli
+ *
+ */
 public class TutorLoginController
 {
 	/**
@@ -105,21 +111,38 @@ public class TutorLoginController
 		givenPassword = password;
 	}
 	
+	/**
+	 * Get the email address.
+	 * @return email address.
+	 */
 	public String getEmail()
 	{
 		return emailField.getText();
 	}
 	
+	/**
+	 * Get the netID.
+	 * @return netID.
+	 */
 	public String getNetID()
 	{
 		return netIDField.getText();
 	}
 	
+	/**
+	 * Get the password.
+	 * @return password.
+	 */
 	public String getPassword()
 	{
 		return passwordField.getText();
 	}
 	
+	/**
+	 * This method is called after all FXML components
+	 * have been loaded and references set. This will
+	 * fill in the email, netID, and password fields.
+	 */
 	@FXML
 	public void initialize()
 	{
@@ -129,6 +152,12 @@ public class TutorLoginController
 		passwordField.setText(givenPassword);
 	}
 	
+	/**
+	 * The start button implements this onAction method.
+	 * It will check requirements first and then call
+	 * another method to start the thread.
+	 * @param event An ActionEvent for a node.
+	 */
 	@FXML
 	public void startButton(ActionEvent event)
 	{
@@ -144,6 +173,11 @@ public class TutorLoginController
 		}
 	}
 	
+	/**
+	 * Checks requirements and starts the "tutor login" thread
+	 * if email, netID, and password fields are correct.
+	 * @param button Start button.
+	 */
 	private void startDailyLogin(Button button)
 	{
 		String errorMessage = null;
@@ -173,6 +207,9 @@ public class TutorLoginController
 		tutorThread.start();
 	}
 	
+	/**
+	 * Interrupts the "login tutor" thread.
+	 */
 	public void stopThread()
 	{
 		if(tutorThread != null && tutorThread.isAlive())
@@ -181,22 +218,43 @@ public class TutorLoginController
 		}
 	}
 	
+	/**
+	 * Reset the fields back to normal and the button back to "start".
+	 */
 	private void reset()
 	{
 		startLoginButton.setText("Start");
 		emailField.getParent().setDisable(false);
 	}
 	
+	/**
+	 * Thread that is the "tutor login" process.
+	 * @author colli
+	 *
+	 */
 	private class TutorTimedLoginThread extends Thread
 	{
+		/**
+		 * The tutor to login and logout.
+		 */
 		private Tutor tutor;
 		
+		/**
+		 * Creates a tutor from parameters.
+		 * @param emailIn tutor email
+		 * @param netIDIn tutor netID
+		 * @param passwordIn tutor password
+		 * @param type type of browser to use when logging in or out
+		 */
 		public TutorTimedLoginThread(String emailIn, 
 				String netIDIn, String passwordIn, BrowserType type)
 		{
 			tutor = new Tutor(netIDIn, passwordIn, emailIn, type);
 		}
 		
+		/**
+		 * The "tutor login" process.
+		 */
 		public void run()
 		{
 			try
