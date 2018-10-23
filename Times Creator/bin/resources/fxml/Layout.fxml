@@ -350,6 +350,11 @@
                       <MenuItem mnemonicParsing="false" onAction="#tutorLoginMenu" text="Tutor Login" />
                     </items>
                   </Menu>
+                  <Menu mnemonicParsing="false" text="Help">
+                    <items>
+                      <MenuItem mnemonicParsing="false" onAction="#aboutMenu" text="About" />
+                    </items>
+                  </Menu>
               </menus>
             </MenuBar>
          </children>

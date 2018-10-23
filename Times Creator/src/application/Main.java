@@ -30,6 +30,11 @@ public class Main extends Application
 	public static final String TUTOR_LOGIN_FXML = "/resources/fxml/TutorLoginLayout.fxml";
 	
 	/**
+	 * About window FXML file.
+	 */
+	public static final String ABOUT_FXML = "/resources/fxml/About.fxml";
+	
+	/**
 	 * If a non-user error occurs, this will be the default error message shown to the user.
 	 */
 	public static final String DEFAULT_ERROR_MESSAGE = "Oops! Something went wrong. Go to the 'About' section and contact the owner.";

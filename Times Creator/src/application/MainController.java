@@ -204,6 +204,11 @@ public class MainController
 	private Stage tutorLoginStage;
 	
 	/**
+	 * Stage for the about scene.
+	 */
+	private Stage aboutStage;
+	
+	/**
 	 * A string to keep hold of the email to load it back 
 	 * when the "tutor login" scene comes back.
 	 */
@@ -248,6 +253,11 @@ public class MainController
 		tutorLoginStage = new Stage();
 		tutorLoginStage.setTitle("Tutor Login");
 		tutorLoginStage.setResizable(false);
+		
+		aboutStage = new Stage();
+		aboutStage.setTitle("About");
+		aboutStage.setResizable(false);
+		
 		fileChooser.getExtensionFilters().addAll(filter);
 	}
 	
@@ -415,7 +425,7 @@ public class MainController
 		window.setDisable(true);
 		TutorLoginController controller = new TutorLoginController(shifts, tutorEmail,
 				tutorNetID, tutorPassword);
-		Scene scene = Main.loadScene(MainController.class, controller, Main.TUTOR_LOGIN_FXML);
+		Scene scene = Main.loadScene(this.getClass(), controller, Main.TUTOR_LOGIN_FXML, Main.MAIN_CSS);
 		tutorLoginStage.setScene(scene);
 		tutorLoginStage.show();
 		tutorLoginStage.setOnCloseRequest(e -> {
@@ -425,6 +435,14 @@ public class MainController
 			tutorNetID = controller.getNetID();
 			tutorPassword = controller.getPassword();
 		});
+	}
+	
+	@FXML
+	private void aboutMenu(ActionEvent event) throws IOException
+	{
+		Scene scene = Main.loadScene(this.getClass(), null, Main.ABOUT_FXML, Main.MAIN_CSS);
+		aboutStage.setScene(scene);
+		aboutStage.show();
 	}
 	
 	/**
