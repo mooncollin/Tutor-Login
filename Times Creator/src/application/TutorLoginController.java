@@ -5,8 +5,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.TextStyle;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 
 import javafx.application.Platform;
@@ -63,7 +63,7 @@ public class TutorLoginController
 	/**
 	 * User's work shift data.
 	 */
-	private HashMap<String, ArrayList<Shift>> dayData;
+	private HashMap<String, List<Shift>> dayData;
 	
 	/**
 	 * Thread responsible for the "tutor login" process.
@@ -90,7 +90,7 @@ public class TutorLoginController
 	 * to an empty string.
 	 * @param data User's shift data.
 	 */
-	public TutorLoginController(HashMap<String, ArrayList<Shift>> data)
+	public TutorLoginController(HashMap<String, List<Shift>> data)
 	{
 		this(data, "", "", "");
 	}
@@ -102,7 +102,7 @@ public class TutorLoginController
 	 * @param netID User's netID.
 	 * @param password User's password.
 	 */
-	public TutorLoginController(HashMap<String, ArrayList<Shift>> data,
+	public TutorLoginController(HashMap<String, List<Shift>> data,
 			String email, String netID, String password)
 	{
 		dayData = data;
