@@ -44,6 +44,8 @@ public class Main extends Application
 	 */
 	public static final List<String> MAIN_CSS = List.of("/resources/css/application.css");
 	
+	private static final boolean DEBUG_MODE = true;
+	
 	/**
 	 * Sets up the controller and the scene associated with MAIN_FXML
 	 * and shows the main window.
@@ -60,7 +62,14 @@ public class Main extends Application
 		}
 		catch(IOException e)
 		{
-			alert(DEFAULT_ERROR_MESSAGE, Alert.AlertType.ERROR);
+			if(DEBUG_MODE)
+			{
+				e.printStackTrace();
+			}
+			else
+			{
+				alert(DEFAULT_ERROR_MESSAGE, Alert.AlertType.ERROR);
+			}
 			return;
 		}
 		primaryStage.setScene(mainScene);

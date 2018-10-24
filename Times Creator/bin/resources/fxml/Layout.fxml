@@ -11,6 +11,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -19,35 +20,27 @@
    <center>
       <VBox fx:id="daysContainer" BorderPane.alignment="CENTER">
          <children>
-            <GridPane>
-               <columnConstraints>
-                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" />
-                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" />
-                  <ColumnConstraints halignment="CENTER" hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
-               </columnConstraints>
-               <rowConstraints>
-                  <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-               </rowConstraints>
+            <HBox>
                <children>
-                  <Label text="       Start" GridPane.columnIndex="1">
+                  <Label text="Start">
                      <font>
                         <Font size="22.0" />
                      </font>
                   </Label>
-                  <Label text="    Finish" GridPane.columnIndex="2">
+                  <Label text="Finish">
                      <font>
                         <Font size="22.0" />
                      </font>
+                     <HBox.margin>
+                        <Insets left="117.0" />
+                     </HBox.margin>
                   </Label>
                </children>
                <VBox.margin>
-                  <Insets />
+                  <Insets left="180.0" />
                </VBox.margin>
-               <padding>
-                  <Insets bottom="14.0" left="14.0" right="14.0" />
-               </padding>
-            </GridPane>
-            <GridPane fx:id="mondayGridPane">
+            </HBox>
+            <GridPane focusTraversable="true" VBox.vgrow="ALWAYS">
                <columnConstraints>
                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" />
                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" />
@@ -58,7 +51,7 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <Button fx:id="mondayAdd" mnemonicParsing="false" onAction="#addTimes" text="+">
+                  <Button mnemonicParsing="false" text="+">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
@@ -86,7 +79,7 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </VBox.margin>
             </GridPane>
-            <GridPane fx:id="tuesdayGridPane">
+            <GridPane focusTraversable="true" VBox.vgrow="ALWAYS">
                <columnConstraints>
                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" />
                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" />
@@ -97,7 +90,7 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <Button fx:id="tuesdayAdd" mnemonicParsing="false" onAction="#addTimes" text="+">
+                  <Button mnemonicParsing="false" text="+">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
@@ -125,7 +118,7 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </VBox.margin>
             </GridPane>
-            <GridPane fx:id="wednesdayGridPane">
+            <GridPane focusTraversable="true" VBox.vgrow="ALWAYS">
                <columnConstraints>
                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" />
                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" />
@@ -136,7 +129,7 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <Button fx:id="wednesdayAdd" mnemonicParsing="false" onAction="#addTimes" text="+">
+                  <Button mnemonicParsing="false" text="+">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
@@ -164,7 +157,7 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </VBox.margin>
             </GridPane>
-            <GridPane fx:id="thursdayGridPane">
+            <GridPane focusTraversable="true" VBox.vgrow="ALWAYS">
                <columnConstraints>
                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" />
                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" />
@@ -175,7 +168,7 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <Button fx:id="thursdayAdd" mnemonicParsing="false" onAction="#addTimes" text="+">
+                  <Button mnemonicParsing="false" text="+">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
@@ -203,7 +196,7 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </VBox.margin>
             </GridPane>
-            <GridPane fx:id="fridayGridPane">
+            <GridPane focusTraversable="true" VBox.vgrow="ALWAYS">
                <columnConstraints>
                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" />
                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" />
@@ -214,7 +207,7 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <Button fx:id="fridayAdd" mnemonicParsing="false" onAction="#addTimes" text="+">
+                  <Button mnemonicParsing="false" text="+">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
@@ -242,7 +235,7 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </VBox.margin>
             </GridPane>
-            <GridPane fx:id="saturdayGridPane">
+            <GridPane focusTraversable="true" VBox.vgrow="ALWAYS">
                <columnConstraints>
                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" />
                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" />
@@ -253,7 +246,7 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <Button fx:id="saturdayAdd" mnemonicParsing="false" onAction="#addTimes" text="+">
+                  <Button mnemonicParsing="false" text="+">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
@@ -281,7 +274,7 @@
                   <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                </VBox.margin>
             </GridPane>
-            <GridPane fx:id="sundayGridPane">
+            <GridPane focusTraversable="true" VBox.vgrow="ALWAYS">
                <columnConstraints>
                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" />
                   <ColumnConstraints halignment="RIGHT" hgrow="SOMETIMES" minWidth="10.0" />
@@ -292,7 +285,7 @@
                   <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                </rowConstraints>
                <children>
-                  <Button fx:id="sundayAdd" mnemonicParsing="false" onAction="#addTimes" text="+">
+                  <Button mnemonicParsing="false" text="+">
                      <cursor>
                         <Cursor fx:constant="HAND" />
                      </cursor>
