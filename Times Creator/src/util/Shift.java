@@ -31,8 +31,23 @@ public class Shift
 	{
 		String[] startData = startStr.split(":");
 		String[] stopData = stopStr.split(":");
-		setStart(Integer.parseInt(startData[0]), Integer.parseInt(startData[1]));
-		setStop(Integer.parseInt(stopData[0]), Integer.parseInt(stopData[1]));
+		if(startData.length == 1)
+		{
+			setStart(Integer.parseInt(startData[0]), 0);
+		}
+		else
+		{
+			setStart(Integer.parseInt(startData[0]), Integer.parseInt(startData[1]));
+		}
+		if(stopData.length == 1)
+		{
+			setStop(Integer.parseInt(stopData[0]), 0);
+		}
+		else
+		{
+			setStop(Integer.parseInt(stopData[0]), Integer.parseInt(stopData[1]));
+		}
+		
 	}
 	
 	/**
@@ -71,5 +86,16 @@ public class Shift
 	public LocalTime getStop()
 	{
 		return stop;
+	}
+	
+	/**
+	 * This returns a string in the form HH:MM-HH:MM for
+	 * first the start and then the stop time.
+	 * @return a string representing this shift object. 
+	 */
+	@Override
+	public String toString()
+	{
+		return String.format("%s-%s", start, stop);
 	}
 }
