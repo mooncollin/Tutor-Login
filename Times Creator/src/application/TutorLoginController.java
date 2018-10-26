@@ -259,6 +259,31 @@ public class TutorLoginController
 		{
 			try
 			{
+				Platform.runLater(new Runnable() {
+					public void run()
+					{
+						loginOutput.appendText("Checking Credentials...\n");
+					}
+				});
+				if(!tutor.checkCredentials())
+				{
+					tutor.closeDriver();
+					Platform.runLater(new Runnable() {
+						public void run()
+						{
+							reset();
+							loginOutput.appendText("Invalid Credentials\n");
+						}
+					});
+					return;
+				}
+				Platform.runLater(new Runnable() {
+					public void run()
+					{
+						loginOutput.appendText("Credentials Correct!\n");
+					}
+				});
+				tutor.closeDriver();
 				while(true)
 				{
 					LocalDateTime now;
@@ -283,35 +308,14 @@ public class TutorLoginController
 							loginOutput.appendText(String.format("Need to wait %d seconds until work!\n", waitDuration.toSeconds()));
 							Thread.sleep(waitDuration.toMillis());
 							loginOutput.appendText("Time to work!\n");
-							if(!tutor.login())
-							{
-								Platform.runLater(new Runnable() {
-									public void run()
-									{
-										reset();
-										loginOutput.appendText("Invalid Credentials\n");
-									}
-								});
-								return;
-							}
+							tutor.working(true);
 							now = LocalDateTime.now();
 							later = LocalDateTime.of(LocalDate.now(), shift.getStop());
 							waitDuration = Duration.between(now, later);
 							loginOutput.appendText(String.format("Need to wait %d seconds until off work!\n", waitDuration.toSeconds()));
 							Thread.sleep(waitDuration.toMillis());
 							loginOutput.appendText("Time to leave work!\n");
-							if(!tutor.logout())
-							{
-								Platform.runLater(new Runnable() {
-									public void run()
-									{
-										reset();
-										loginOutput.appendText("Invalid Credentials\n");
-									}
-								});
-								return;
-							}
-							
+							tutor.working(false);
 						}
 					}
 					if(noShifts)

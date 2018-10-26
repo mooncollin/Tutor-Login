@@ -1,11 +1,9 @@
 package tutorlogin;
 
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
-
 import org.openqa.selenium.By;
+import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -14,8 +12,10 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.opera.OperaDriver;
 import org.openqa.selenium.safari.SafariDriver;
-import org.openqa.selenium.support.ui.FluentWait;
-import org.openqa.selenium.support.ui.Wait;
+import selenium.AdvancedActions;
+import selenium.ClickAction;
+import selenium.KeysAction;
+import selenium.WaitAction;
 
 /**
  * Allows for interacting with the CSLC tutoring portal.
@@ -33,6 +33,29 @@ public class Tutor
 	 * The default browser to use to interact with the CSLC tutoring portal.
 	 */
 	private static final BrowserType DEFAULT_BROWSER = BrowserType.EDGE;
+	
+	/**
+	 * Default amount of seconds to wait for a new page to load.
+	 */
+	private static final int DEFAULT_SECONDS_WAITING = 10;
+	
+	/**
+	 * The chain of actions to perform for navigating to the tutor edit page.
+	 */
+	private static final AdvancedActions TUTOR_WORKING_PROCESS = AdvancedActions.of(
+			new ClickAction(null, By.linkText("Tutor Login")),
+			new WaitAction(null, By.id("identifierId"), DEFAULT_SECONDS_WAITING),
+			new KeysAction(null, By.id("identifierId"), null), // email field
+			new ClickAction(null, By.id("identifierNext")),
+			new WaitAction(null, By.id("username"), DEFAULT_SECONDS_WAITING),
+			new KeysAction(null, By.id("username"), null), // username field
+			new KeysAction(null, By.id("password"), null), // password field
+			new ClickAction(null, By.name("_eventId_proceed")),
+			new WaitAction(null, By.linkText("Tutor"), DEFAULT_SECONDS_WAITING),
+			new ClickAction(null, By.linkText("Tutor")),
+			new ClickAction(null, By.linkText("Edit User")),
+			new WaitAction(null, By.id("is_working"), DEFAULT_SECONDS_WAITING)
+	);
 	
 	/**
 	 * The selenium web driver.
@@ -88,6 +111,7 @@ public class Tutor
 		if(emailIn == null)
 			throw new NullPointerException();
 		email = emailIn;
+		((KeysAction) TUTOR_WORKING_PROCESS.findActionWithBy(By.id("identifierId"), KeysAction.class)).setKeys(email);
 	}
 	
 	/**
@@ -115,6 +139,7 @@ public class Tutor
 		if(usernameIn == null)
 			throw new NullPointerException();
 		username = usernameIn;
+		((KeysAction) TUTOR_WORKING_PROCESS.findActionWithBy(By.id("username"), KeysAction.class)).setKeys(username);
 	}
 	
 	/**
@@ -126,6 +151,7 @@ public class Tutor
 		if(passwordIn == null)
 			throw new NullPointerException();
 		password = passwordIn;
+		((KeysAction) TUTOR_WORKING_PROCESS.findActionWithBy(By.id("password"), KeysAction.class)).setKeys(password);
 	}
 	
 	/**
@@ -155,33 +181,75 @@ public class Tutor
 		return browserType;
 	}
 	
+	public void closeDriver()
+	{
+		if(driver != null && !driver.toString().contains("null"))
+			driver.quit();
+	}
+	
 	/**
 	 * Attempts to set to currently working to the tutoring portal.
+	 * @param work true to set the tutor as currently working, false to
+	 * set the tutor as currently not working
 	 * @return true if successful, false otherwise.
 	 */
-	public boolean login()
+	public boolean working(boolean work)
 	{
-		createDriver();
-		return logging(true);
+		if(!editUser())
+			return false;
+		WebElement workingCheckbox = driver.findElement(By.id("is_working"));
+		if(work && !workingCheckbox.isSelected()
+		   ||
+		   !work && workingCheckbox.isSelected())
+		{
+			workingCheckbox.click();
+		}
+		WebElement submitButton = driver.findElement(By.cssSelector("button[type=\"submit\"]"));
+		submitButton.click();
+		driver.quit();
+		return true;
 	}
 	
 	/**
-	 * Attempts to set to currently not working to the tutoring portal.
-	 * @return true if successful, false otherwise.
+	 * Checks if the tutor is currently working.
+	 * @return true if this tutor is currently working, false otherwise
 	 */
-	public boolean logout()
+	public boolean isWorking()
 	{
-		createDriver();
-		return logging(false);
+		editUser();
+		WebElement workingCheckbox = driver.findElement(By.id("is_working"));
+		return workingCheckbox.isSelected();
 	}
 	
 	/**
-	 * Needs to be implemented.
-	 * @return needs to be implemented.
+	 * Checks if the tutor is currently logged in on the WebDriver.
+	 * @return true if this tutor it currently logged in, false otherwise
 	 */
 	public boolean isLoggedIn()
 	{
+		startDriver(TUTOR_URL);
+		try
+		{
+			driver.findElement(By.linkText("Tutor Login"));
+		}
+		catch(org.openqa.selenium.NoSuchElementException e)
+		{
+			return true;
+		}
 		return false;
+	}
+	
+	/**
+	 * Starts the driver if it not already started, and will go to the specified
+	 * URL.
+	 * @param url URL for the driver to go to, or null to not change location
+	 */
+	private void startDriver(String url)
+	{
+		if(driver == null || driver.toString().contains("null"))
+			setDriver();
+		if(url != null)
+			driver.get(url);
 	}
 	
 	/**
@@ -193,7 +261,6 @@ public class Tutor
 		if(classes != null)
 			return classes;
 		
-		createDriver();
 		if(!editUser())
 			return new ArrayList<String>();
 		
@@ -220,95 +287,68 @@ public class Tutor
 	}
 	
 	/**
-	 * Sets working status for this tutor base on given log.
-	 * @param log true to set currently working to true, false to 
-	 * set currently working to false
-	 * @return true if successful, false otherwise.
+	 * Checks if all the credentials given are correct.
+	 * @return true if all credentials are correct, false otherwise
 	 */
-	private boolean logging(boolean log)
+	public boolean checkCredentials()
 	{
-		if(!editUser()) return false;
-		WebElement workingCheckbox = driver.findElement(By.id("is_working"));
-		if(log && !workingCheckbox.isSelected()
-		   ||
-		   !log && workingCheckbox.isSelected())
-		{
-			workingCheckbox.click();
-		}
-		WebElement submitButton = driver.findElement(By.cssSelector("button[type=\"submit\"]"));
-		submitButton.click();
-		driver.quit();
-		return true;
-	}
-	
-	/**
-	 * Waits for an element on the current web driver to appear.
-	 * @param by The specific search term.
-	 * @param seconds seconds to wait for the given element.
-	 * @return the element found, or null if it could not
-	 * find it in the given time.
-	 */
-	private WebElement waitForPage(By by, int seconds)
-	{
-		Wait<WebDriver> wait = new FluentWait<WebDriver>(driver)
-				.withTimeout(Duration.ofSeconds(seconds))
-				.pollingEvery(Duration.ofSeconds(1))
-				.ignoring(org.openqa.selenium.NoSuchElementException.class);
 		try
 		{
-			return wait.until(new Function<WebDriver, WebElement>(){
-				public WebElement apply(WebDriver driver) {
-					return driver.findElement(by);
-				}
-			});
+			startDriver(TUTOR_URL);
+			TUTOR_WORKING_PROCESS.perform(3);
+			WebElement googleSignInMessage = driver.findElement(By.cssSelector("div[class='dEOOab RxsGPe']"));
+			TUTOR_WORKING_PROCESS.perform(3, 4);
+			try
+			{
+				Thread.sleep(250);
+			} catch (InterruptedException e)
+			{
+			}
+			if(googleSignInMessage.getText().contains("Couldn't find your Google Account"))
+			{
+				return false;
+			}
+			TUTOR_WORKING_PROCESS.perform(4, 8);
 		}
-		catch(Exception e)
+		catch(TimeoutException e)
 		{
-			driver.quit();
-			return null;
+			return false;
 		}
+		
+		try
+		{
+			Thread.sleep(250);
+		} catch (InterruptedException e)
+		{
+		}
+		try
+		{
+			driver.findElement(By.cssSelector("p[class='form-element form-error']"));
+			return false;
+		}
+		catch(org.openqa.selenium.NoSuchElementException e)
+		{
+		}
+		
+		return true;
 	}
 	
 	/**
 	 * Logs the user into the tutoring portal.
 	 * @return true if successful, false otherwise.
 	 */
-	private boolean driverLogin()
+	private boolean driverLogin() throws InvalidCredentials
 	{
+		if(isLoggedIn())
+			return true;
 		try
 		{
-			driver.get(TUTOR_URL);
+			TUTOR_WORKING_PROCESS.perform(8);
 		}
-		catch(org.openqa.selenium.NoSuchSessionException e)
-		{
-			setDriver();
-			driver.get(TUTOR_URL);
-		}
-		try
-		{
-			WebElement loginButton = driver.findElement(By.linkText("Tutor Login"));
-			loginButton.click();
-			if(waitForPage(By.id("identifierId"), 10) == null) return false;
-			WebElement emailTextField = driver.findElement(By.id("identifierId"));
-			emailTextField.clear();
-			emailTextField.sendKeys(email);
-			WebElement nextButton = driver.findElement(By.id("identifierNext"));
-			nextButton.click();
-			if(waitForPage(By.id("username"), 10) == null) return false;
-			WebElement netIDTextField = driver.findElement(By.id("username"));
-			WebElement netIDPasswordField = driver.findElement(By.id("password"));
-			netIDTextField.clear();
-			netIDTextField.sendKeys(username);
-			netIDPasswordField.clear();
-			netIDPasswordField.sendKeys(password);
-			WebElement tutorLoginButton = driver.findElement(By.name("_eventId_proceed"));
-			tutorLoginButton.click();
-			if(waitForPage(By.linkText("Tutor"), 10) == null) return false;
-		}
-		catch(org.openqa.selenium.NoSuchElementException e)
+		catch(TimeoutException e)
 		{
 			driver.quit();
-			return false;
+			throw new InvalidCredentials();
 		}
 		return true;
 	}
@@ -321,11 +361,7 @@ public class Tutor
 	private boolean editUser()
 	{
 		if(!driverLogin()) return false;
-		WebElement tutorButton = driver.findElement(By.linkText("Tutor"));
-		tutorButton.click();
-		WebElement editUserButton = driver.findElement(By.linkText("Edit User"));
-		editUserButton.click();
-		if(waitForPage(By.id("is_working"), 10) == null) return false;
+		TUTOR_WORKING_PROCESS.perform(8, 12);
 		return true;
 	}
 	
@@ -359,14 +395,6 @@ public class Tutor
 			default:
 				driver = new ChromeDriver();
 		}
-	}
-	
-	/**
-	 * Creates a web driver if one does not exist already.
-	 */
-	private void createDriver()
-	{
-		if(driver == null || driver.toString().contains("null"))
-			setDriver();
+		TUTOR_WORKING_PROCESS.setDriver(driver, true);
 	}
 }

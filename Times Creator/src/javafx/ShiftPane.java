@@ -1,4 +1,4 @@
-package util;
+package javafx;
 
 import java.time.DateTimeException;
 import java.util.ArrayList;
@@ -18,6 +18,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+import util.Pair;
+import util.Shift;
 
 public class ShiftPane
 {

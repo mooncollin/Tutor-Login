@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javafx.ShiftPane;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -23,7 +24,6 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import util.Pair;
 import util.Shift;
-import util.ShiftPane;
 
 /**
  * This controller contains FXML hooks into the MAIN_FXML file.
@@ -120,6 +120,10 @@ public class MainController
 			if(tutorLoginStage != null)
 			{
 				tutorLoginStage.close();
+			}
+			if(aboutStage != null)
+			{
+				aboutStage.close();
 			}
 		});
 		tutorEmail = "";
