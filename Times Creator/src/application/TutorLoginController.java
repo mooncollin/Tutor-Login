@@ -214,6 +214,7 @@ public class TutorLoginController
 	{
 		if(tutorThread != null && tutorThread.isAlive())
 		{
+			tutorThread.tutor.closeDriver();
 			tutorThread.interrupt();
 		}
 	}
@@ -334,6 +335,7 @@ public class TutorLoginController
 			}
 			catch(InterruptedException | org.openqa.selenium.WebDriverException e)
 			{
+				tutor.closeDriver();
 				Platform.runLater(new Runnable() {
 					public void run()
 					{

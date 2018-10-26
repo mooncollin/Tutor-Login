@@ -184,7 +184,15 @@ public class Tutor
 	public void closeDriver()
 	{
 		if(driver != null && !driver.toString().contains("null"))
-			driver.quit();
+		{
+			try
+			{
+				driver.quit();
+			}
+			catch(org.openqa.selenium.WebDriverException e)
+			{
+			}
+		}
 	}
 	
 	/**

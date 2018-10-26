@@ -136,6 +136,7 @@ public class MainController
 		this.stage.setOnCloseRequest(e -> {
 			if(tutorLoginStage != null)
 			{
+				tutorLoginStage.getOnCloseRequest().handle(null);
 				tutorLoginStage.close();
 			}
 			if(aboutStage != null)
