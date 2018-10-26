@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.DateTimeException;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -58,6 +59,12 @@ public class MainController
 	 * A regex pattern that helps parse text when reading in a file.
 	 */
 	private static final Pattern READ_LINE_PATTERN = Pattern.compile("(\\d{1,2}):?(\\d{1,2}?)-(\\d{1,2}):?(\\d{1,2}?)(?:$|,)");
+	
+	private static final String INVALID_START_AND_END_TIMES = "Start times must be before end times";
+	
+	private static final String NO_TIMES_ENTERED = "No times entered";
+	
+	private static final String OVERLAP_TIMES = "Shifts cannot overlap";
 	
 	/**
 	 * Top-level region of the Layout.fxml layout.
@@ -173,6 +180,12 @@ public class MainController
 	@FXML
 	public void saveFile(ActionEvent event)
 	{
+		String alertMessage = ShiftCompare.toAlertString(correctShifts());
+		if(alertMessage != null)
+		{
+			Main.alert(alertMessage, AlertType.ERROR);
+			return;
+		}
 		String output = "";
 		
 		int counter = 1;
@@ -212,7 +225,7 @@ public class MainController
 		
 		if(isEmpty)
 		{
-			Main.alert("Please complete various textfields", AlertType.ERROR);
+			Main.alert(NO_TIMES_ENTERED, AlertType.ERROR);
 			return;
 		}
 		
@@ -268,9 +281,27 @@ public class MainController
 	@FXML
 	private void tutorLoginMenu(ActionEvent event) throws IOException
 	{
-		var shifts = createShifts();
-		if(shifts == null)
+		String alertMessage = ShiftCompare.toAlertString(correctShifts());
+		if(alertMessage != null)
+		{
+			Main.alert(alertMessage, AlertType.ERROR);
 			return;
+		}
+		var shifts = createShifts();
+		boolean allEmpty = true;
+		for(String key : shifts.keySet())
+		{
+			if(!shifts.get(key).isEmpty())
+			{
+				allEmpty = false;
+				break;
+			}
+		}
+		if(allEmpty)
+		{
+			Main.alert(NO_TIMES_ENTERED, AlertType.ERROR);
+			return;
+		}
 		
 		window.setDisable(true);
 		TutorLoginController controller = new TutorLoginController(shifts, tutorEmail,
@@ -364,5 +395,52 @@ public class MainController
 		}
 		
 		return shifts;
+	}
+	
+	private ShiftCompare correctShifts()
+	{
+		for(ShiftPane pane : panes)
+		{
+			LocalTime lastStop = null;
+			int counter = 1;
+			for(Shift shift : pane.getShifts())
+			{
+				if(shift.getStart().isAfter(shift.getStop()) || shift.getStart().equals(shift.getStop()))
+					return ShiftCompare.END_BEFORE_START;
+				if(counter > 1)
+				{
+					if(lastStop.isAfter(shift.getStart()) || lastStop.equals(shift.getStart()))
+						return ShiftCompare.SHIFT_END_OVERLAP;
+				}
+				counter++;
+				lastStop = shift.getStop();
+			}
+			
+		}
+		
+		return ShiftCompare.CORRECT;
+	}
+	
+	private enum ShiftCompare
+	{
+		CORRECT, END_BEFORE_START, SHIFT_END_OVERLAP;
+		
+		public static String toAlertString(ShiftCompare compareValue)
+		{
+			String alert = null;
+			switch(compareValue)
+			{
+				case END_BEFORE_START:
+					alert = INVALID_START_AND_END_TIMES;
+					break;
+				case SHIFT_END_OVERLAP:
+					alert = OVERLAP_TIMES;
+					break;
+				case CORRECT:
+					break;
+			}
+			
+			return alert;
+		}
 	}
 }

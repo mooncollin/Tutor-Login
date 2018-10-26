@@ -57,6 +57,7 @@ public class ShiftPane
 		public TextFormatter.Change apply(TextFormatter.Change change)
 		{
 			String newText = change.getText();
+			String possibleNewText = change.getControlNewText();
 			TextFormatter.Change result = change;
 			if(UNALLOWED_CHARACTERS_TEXTFIELD_PATTERN.matcher(newText).matches())
 			{
@@ -67,6 +68,24 @@ public class ShiftPane
 				if(change.getControlText().contains(":"))
 				{
 					result = null;
+				}
+			}
+			else if(!possibleNewText.isEmpty())
+			{
+				
+				String[] hourAndMinute = possibleNewText.split(":");
+				int hour = Integer.parseInt(hourAndMinute[0]);
+				if(hour >= 24)
+				{
+					result = null;
+				}
+				if(hourAndMinute.length > 1)
+				{
+					int minute = Integer.parseInt(hourAndMinute[1]);
+					if(minute >= 60)
+					{
+						result = null;
+					}
 				}
 			}
 			
