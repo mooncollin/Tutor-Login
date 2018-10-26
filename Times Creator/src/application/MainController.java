@@ -60,10 +60,20 @@ public class MainController
 	 */
 	private static final Pattern READ_LINE_PATTERN = Pattern.compile("(\\d{1,2}):?(\\d{1,2}?)-(\\d{1,2}):?(\\d{1,2}?)(?:$|,)");
 	
+	/**
+	 * Default alert message when a shift's start if after or equal to
+	 * its end time.
+	 */
 	private static final String INVALID_START_AND_END_TIMES = "Start times must be before end times";
 	
+	/**
+	 * Default alert message when no shift information has been entered.
+	 */
 	private static final String NO_TIMES_ENTERED = "No times entered";
 	
+	/**
+	 * Default alert message when two or more shifts overlap.
+	 */
 	private static final String OVERLAP_TIMES = "Shifts cannot overlap";
 	
 	/**
@@ -397,6 +407,11 @@ public class MainController
 		return shifts;
 	}
 	
+	/**
+	 * Checks if the current shifts have start times before end times
+	 * and that there is no overlap between shifts.
+	 * @return a result from comparing shifts
+	 */
 	private ShiftCompare correctShifts()
 	{
 		for(ShiftPane pane : panes)
@@ -421,10 +436,23 @@ public class MainController
 		return ShiftCompare.CORRECT;
 	}
 	
+	/**
+	 * Constants that illistrate the outcomes of
+	 * comparing shifts.
+	 * @author colli
+	 *
+	 */
 	private enum ShiftCompare
 	{
 		CORRECT, END_BEFORE_START, SHIFT_END_OVERLAP;
 		
+		/**
+		 * Converts a ShiftCompare result to its equivalent
+		 * alert message, or null if correct.
+		 * @param compareValue a result from comparing all shifts
+		 * from a certain day
+		 * @return an alert message, or null if correct
+		 */
 		public static String toAlertString(ShiftCompare compareValue)
 		{
 			String alert = null;
