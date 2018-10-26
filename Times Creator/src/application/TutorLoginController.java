@@ -332,8 +332,15 @@ public class TutorLoginController
 					Thread.sleep(waitDuration.toMillis());
 				}
 			}
-			catch(InterruptedException e)
+			catch(InterruptedException | org.openqa.selenium.WebDriverException e)
 			{
+				Platform.runLater(new Runnable() {
+					public void run()
+					{
+						reset();
+						loginOutput.appendText("Error Occured\n");
+					}
+				});
 				return;
 			}
 		}
