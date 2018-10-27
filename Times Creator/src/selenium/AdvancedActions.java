@@ -161,6 +161,11 @@ public class AdvancedActions implements Iterable<AdvancedAction>
 		actions.clear();
 	}
 	
+	public int size()
+	{
+		return actions.size();
+	}
+	
 	/**
 	 * Creates and adds a WaitAction on the given search condition and seconds
 	 * to wait.

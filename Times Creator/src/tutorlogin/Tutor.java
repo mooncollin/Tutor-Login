@@ -4,16 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.edge.EdgeDriver;
-import org.openqa.selenium.firefox.FirefoxDriver;
-import org.openqa.selenium.ie.InternetExplorerDriver;
-import org.openqa.selenium.opera.OperaDriver;
-import org.openqa.selenium.safari.SafariDriver;
 import selenium.AdvancedActions;
+import selenium.BrowserType;
 import selenium.ClickAction;
+import selenium.DriverUser;
 import selenium.KeysAction;
 import selenium.WaitAction;
 
@@ -22,7 +17,7 @@ import selenium.WaitAction;
  * @author colli
  *
  */
-public class Tutor
+public class Tutor extends DriverUser
 {
 	/**
 	 * URL for the CSLC tutoring portal.
@@ -32,7 +27,7 @@ public class Tutor
 	/**
 	 * The default browser to use to interact with the CSLC tutoring portal.
 	 */
-	private static final BrowserType DEFAULT_BROWSER = BrowserType.EDGE;
+	private static final BrowserType DEFAULT_BROWSER = BrowserType.CHROME;
 	
 	/**
 	 * Default amount of seconds to wait for a new page to load.
@@ -42,7 +37,7 @@ public class Tutor
 	/**
 	 * The chain of actions to perform for navigating to the tutor edit page.
 	 */
-	private static final AdvancedActions TUTOR_WORKING_PROCESS = AdvancedActions.of(
+	private final AdvancedActions TUTOR_WORKING_PROCESS = AdvancedActions.of(
 			new ClickAction(null, By.linkText("Tutor Login")),
 			new WaitAction(null, By.id("identifierId"), DEFAULT_SECONDS_WAITING),
 			new KeysAction(null, By.id("identifierId"), null), // email field
@@ -56,16 +51,6 @@ public class Tutor
 			new ClickAction(null, By.linkText("Edit User")),
 			new WaitAction(null, By.id("is_working"), DEFAULT_SECONDS_WAITING)
 	);
-	
-	/**
-	 * The selenium web driver.
-	 */
-	private WebDriver driver;
-	
-	/**
-	 * The browser to use for the web driver.
-	 */
-	private BrowserType browserType;
 	
 	/**
 	 * The tutor email.
@@ -96,9 +81,9 @@ public class Tutor
 	 */
 	public Tutor(String usernameIn, String passwordIn, String emailIn, BrowserType browserType)
 	{
+		super(browserType);
 		setUsername(usernameIn);
 		setPassword(passwordIn);
-		setBrowserType(browserType);
 		setEmail(emailIn);
 	}
 	
@@ -118,6 +103,7 @@ public class Tutor
 	 * Sets the browser type.
 	 * @param browserType browser type to set
 	 */
+	@Override
 	public void setBrowserType(BrowserType browserType)
 	{
 		if(browserType == null)
@@ -181,20 +167,6 @@ public class Tutor
 		return browserType;
 	}
 	
-	public void closeDriver()
-	{
-		if(driver != null && !driver.toString().contains("null"))
-		{
-			try
-			{
-				driver.quit();
-			}
-			catch(org.openqa.selenium.WebDriverException e)
-			{
-			}
-		}
-	}
-	
 	/**
 	 * Attempts to set to currently working to the tutoring portal.
 	 * @param work true to set the tutor as currently working, false to
@@ -247,18 +219,6 @@ public class Tutor
 		return false;
 	}
 	
-	/**
-	 * Starts the driver if it not already started, and will go to the specified
-	 * URL.
-	 * @param url URL for the driver to go to, or null to not change location
-	 */
-	private void startDriver(String url)
-	{
-		if(driver == null || driver.toString().contains("null"))
-			setDriver();
-		if(url != null)
-			driver.get(url);
-	}
 	
 	/**
 	 * Gives the classes this tutor can currently tutor.
@@ -378,31 +338,10 @@ public class Tutor
 	 * This will cause the web driver to be alive and
 	 * visual.
 	 */
-	private void setDriver()
+	@Override
+	protected void setDriver()
 	{
-		switch(browserType)
-		{
-			case FIREFOX:
-				driver = new FirefoxDriver();
-				break;
-			case CHROME:
-				driver = new ChromeDriver();
-				break;
-			case EDGE:
-				driver = new EdgeDriver();
-				break;
-			case INTERNET_EXPLORER:
-				driver = new InternetExplorerDriver();
-				break;
-			case OPERA:
-				driver = new OperaDriver();
-				break;
-			case SAFARI:
-				driver = new SafariDriver();
-				break;
-			default:
-				driver = new ChromeDriver();
-		}
+		super.setDriver();
 		TUTOR_WORKING_PROCESS.setDriver(driver, true);
 	}
 }

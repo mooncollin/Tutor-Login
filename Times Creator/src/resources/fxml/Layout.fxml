@@ -341,6 +341,7 @@
                   <Menu mnemonicParsing="false" text="Tools">
                     <items>
                       <MenuItem mnemonicParsing="false" onAction="#tutorLoginMenu" text="Tutor Login" />
+                        <MenuItem mnemonicParsing="false" onAction="#fireflyMenu" text="Firefly Hours" />
                     </items>
                   </Menu>
                   <Menu mnemonicParsing="false" text="Help">

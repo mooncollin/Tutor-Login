@@ -1,4 +1,4 @@
-package tutorlogin;
+package selenium;
 
 /**
  * Used to signify browser types. Can also convert

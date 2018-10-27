@@ -69,6 +69,10 @@ public class ShiftPane
 				{
 					result = null;
 				}
+				else if(change.getControlText().isEmpty())
+				{
+					result = null;
+				}
 			}
 			else if(!possibleNewText.isEmpty())
 			{

@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javafx.SceneUtils;
 import javafx.ShiftPane;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -109,6 +110,11 @@ public class MainController
 	private Stage aboutStage;
 	
 	/**
+	 * Stage for the firefly scene;
+	 */
+	private Stage fireflyStage;
+	
+	/**
 	 * A string to keep hold of the email to load it back 
 	 * when the "tutor login" scene comes back.
 	 */
@@ -126,6 +132,10 @@ public class MainController
 	 */
 	private String tutorPassword;
 	
+	private int fireflyNUID;
+	
+	private String fireflyPassword;
+	
 	/**
 	 * This constructor sets up various maps and initializes some variables.
 	 * @param stage Stage for the main layout.
@@ -136,12 +146,19 @@ public class MainController
 		this.stage.setOnCloseRequest(e -> {
 			if(tutorLoginStage != null)
 			{
-				tutorLoginStage.getOnCloseRequest().handle(null);
+				if(tutorLoginStage.getOnCloseRequest() != null)
+					tutorLoginStage.getOnCloseRequest().handle(null);
 				tutorLoginStage.close();
 			}
 			if(aboutStage != null)
 			{
 				aboutStage.close();
+			}
+			if(fireflyStage != null)
+			{
+				if(fireflyStage.getOnCloseRequest() != null)
+					fireflyStage.getOnCloseRequest().handle(null);
+				fireflyStage.close();
 			}
 		});
 		tutorEmail = "";
@@ -156,7 +173,13 @@ public class MainController
 		aboutStage.setTitle("About");
 		aboutStage.setResizable(false);
 		
+		fireflyStage = new Stage();
+		fireflyStage.setTitle("Firefly Upload Hours");
+		fireflyStage.setResizable(false);
+		
 		fileChooser.getExtensionFilters().addAll(filter);
+		
+		fireflyNUID = -1;
 	}
 	
 	/**
@@ -317,7 +340,7 @@ public class MainController
 		window.setDisable(true);
 		TutorLoginController controller = new TutorLoginController(shifts, tutorEmail,
 				tutorNetID, tutorPassword);
-		Scene scene = Main.loadScene(this.getClass(), controller, Main.TUTOR_LOGIN_FXML, Main.MAIN_CSS);
+		Scene scene = SceneUtils.loadScene(this.getClass(), controller, Main.TUTOR_LOGIN_FXML, Main.MAIN_CSS);
 		tutorLoginStage.setScene(scene);
 		tutorLoginStage.show();
 		tutorLoginStage.setOnCloseRequest(e -> {
@@ -338,9 +361,53 @@ public class MainController
 	@FXML
 	private void aboutMenu(ActionEvent event) throws IOException
 	{
-		Scene scene = Main.loadScene(this.getClass(), null, Main.ABOUT_FXML, Main.MAIN_CSS);
+		Scene scene = SceneUtils.loadScene(this.getClass(), null, Main.ABOUT_FXML, Main.MAIN_CSS);
 		aboutStage.setScene(scene);
 		aboutStage.show();
+	}
+	
+	/**
+	 * The firefly feature implements this onAction method.
+	 * It will show the firefly scene.
+	 * @param event An ActionEvent for a node.
+	 * @throws IOException if it cannot find the Firefly.fxml resource.
+	 */
+	@FXML
+	private void fireflyMenu(ActionEvent event) throws IOException
+	{
+		String alertMessage = ShiftCompare.toAlertString(correctShifts());
+		if(alertMessage != null)
+		{
+			Main.alert(alertMessage, AlertType.ERROR);
+			return;
+		}
+		var shifts = createShifts();
+		boolean allEmpty = true;
+		for(String key : shifts.keySet())
+		{
+			if(!shifts.get(key).isEmpty())
+			{
+				allEmpty = false;
+				break;
+			}
+		}
+		if(allEmpty)
+		{
+			Main.alert(NO_TIMES_ENTERED, AlertType.ERROR);
+			return;
+		}
+		
+		window.setDisable(true);
+		FireflyController controller = new FireflyController(shifts, fireflyNUID, fireflyPassword);
+		Scene scene = SceneUtils.loadScene(this.getClass(), controller, Main.FIREFLY_FXML, Main.MAIN_CSS);
+		fireflyStage.setScene(scene);
+		fireflyStage.show();
+		fireflyStage.setOnCloseRequest(e -> {
+			controller.stopThread();
+			window.setDisable(false);
+			fireflyNUID = controller.getNUID();
+			fireflyPassword = controller.getPassword();
+		});
 	}
 	
 	/**
