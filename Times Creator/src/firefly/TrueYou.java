@@ -5,6 +5,7 @@ import java.util.Map;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 
+import selenium.AdvancedAction;
 import selenium.AdvancedActions;
 import selenium.BrowserType;
 import selenium.ClickAction;
@@ -60,15 +61,15 @@ public class TrueYou extends DriverUser
 	 * The Firefly process actions chain.
 	 */
 	private final AdvancedActions FIREFLY_UPLOAD_PROCESS = AdvancedActions.of(
-			new KeysAction(null, By.id("username"), null),
-			new KeysAction(null, By.id("password"), null),
-			new ClickAction(null, By.cssSelector("button[class='button success']")),
-			new WaitAction(null, By.name("Neptune"), DEFAULT_WAITING_SECONDS),
-			new WaitAction(null, By.id("__content28"), DEFAULT_WAITING_SECONDS),
-			new ClickAction(null, By.id("__content28")),
-			new WaitAction(null, By.id("__content56"), DEFAULT_WAITING_SECONDS),
-			new ClickAction(null, By.id("__content56")),
-			new WaitAction(null, By.id("__jsview1--tableTime-listUl"), DEFAULT_WAITING_SECONDS)
+			new KeysAction(null, By.id("username"), null), // Enter NUID
+			new KeysAction(null, By.id("password"), null), // Enter Password
+			new ClickAction(null, By.cssSelector("button[class='button success']")), // Click login button
+			new WaitAction(null, By.name("Neptune"), DEFAULT_WAITING_SECONDS), // Wait for Firefly main page
+			new WaitAction(null, By.xpath("//div[starts-with(@aria-label, 'Employee Self Service')]"), DEFAULT_WAITING_SECONDS), // Wait for ESS box
+			new ClickAction(null, By.xpath("//div[starts-with(@aria-label, 'Employee Self Service')]")), // Click ESS box
+			new WaitAction(null, By.xpath("//div[starts-with(@aria-label, 'Timesheet Entry')]"), DEFAULT_WAITING_SECONDS), // Wait for Timesheet Entry Box
+			new ClickAction(null, By.xpath("//div[starts-with(@aria-label, 'Timesheet Entry')]")), // Click Timesheet Entry Box
+			new WaitAction(null, By.id("__jsview1--tableTime-listUl"), DEFAULT_WAITING_SECONDS) // Wait for hours table
 	);
 	
 	/**
@@ -218,6 +219,15 @@ public class TrueYou extends DriverUser
 		{
 			this.browserType = browserType;
 		}
+	}
+	
+	/**
+	 * Gets the last action in the FIREFLY_UPLOAD_PROCESS that failed.
+	 * @return the last action that failed to complete its job in the firefly process.
+	 */
+	public AdvancedAction getLastFailedAction()
+	{
+		return FIREFLY_UPLOAD_PROCESS.getLastFailedAction();
 	}
 	
 	/**

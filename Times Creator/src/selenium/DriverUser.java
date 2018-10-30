@@ -10,24 +10,50 @@ import org.openqa.selenium.safari.SafariDriver;
 
 public class DriverUser
 {
+	/**
+	 * The current WebDriver.
+	 */
 	protected WebDriver driver;
+	
+	/**
+	 * The browser to use for the WebDriver.
+	 */
 	protected BrowserType browserType; 
 	
+	/**
+	 * Sets the browser to the given browser type
+	 * and constructs this object.
+	 * @param browserType a browser type to use
+	 * for the WebDriver.
+	 */
 	public DriverUser(BrowserType browserType)
 	{
 		setBrowserType(browserType);
 	}
 	
+	/**
+	 * Sets the browser to the givven browser type.
+	 * @param browserType a browser type to use
+	 * for the WebDriver.
+	 */
 	public void setBrowserType(BrowserType browserType)
 	{
 		this.browserType = browserType;
 	}
 	
+	/**
+	 * Gets the current browser type.
+	 * @return type of browser that this
+	 * user will use for its WebDriver.
+	 */
 	public BrowserType getBrowserType()
 	{
 		return browserType;
 	}
 	
+	/**
+	 * Attemps to close the current driver.
+	 */
 	public void closeDriver()
 	{
 		if(driver != null && !driver.toString().contains("null"))
@@ -40,6 +66,15 @@ public class DriverUser
 			{
 			}
 		}
+	}
+	
+	/**
+	 * Checks whether the current driver is not longer active.
+	 * @return true if dead, false otherwise.
+	 */
+	public boolean isDriverDead()
+	{
+		return driver == null || driver.toString().contains("null");
 	}
 	
 	/**

@@ -27,6 +27,11 @@ public class AdvancedActions implements Iterable<AdvancedAction>
 	private List<AdvancedAction> actions;
 	
 	/**
+	 * The last failed action that failed to succeed when performed.
+	 */
+	private AdvancedAction lastFailedAction;
+	
+	/**
 	 * Creates an AdvancedActions based on a driver and a given sequence
 	 * of actions.
 	 * @param driver WebDriver
@@ -161,9 +166,22 @@ public class AdvancedActions implements Iterable<AdvancedAction>
 		actions.clear();
 	}
 	
+	/**
+	 * Gets the size of the current actions.
+	 * @return the amount of currently stored actions.
+	 */
 	public int size()
 	{
 		return actions.size();
+	}
+	
+	/**
+	 * Gets the last failed action.
+	 * @return the last action that failed to success its perform method.
+	 */
+	public AdvancedAction getLastFailedAction()
+	{
+		return lastFailedAction;
 	}
 	
 	/**
@@ -264,7 +282,16 @@ public class AdvancedActions implements Iterable<AdvancedAction>
 		}
 		while(listIter.nextIndex() < to)
 		{
-			listIter.next().perform();
+			AdvancedAction action = listIter.next();
+			try
+			{
+				action.perform();
+			}
+			catch(org.openqa.selenium.WebDriverException e)
+			{
+				lastFailedAction = action;
+				return;
+			}
 		}
 	}
 }

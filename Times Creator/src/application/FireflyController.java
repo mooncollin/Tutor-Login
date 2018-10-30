@@ -174,7 +174,7 @@ public class FireflyController
 		else
 		{
 			reset();
-			stopThread();
+			this.stopThread();
 		}
 	}
 	
@@ -211,6 +211,8 @@ public class FireflyController
 		 */
 		private TrueYou user;
 		
+		private DetectDeadDriverThread deadThread;
+		
 		/**
 		 * Creates a TrueYou user from the given parameters.
 		 * @param nuid user's nuid.
@@ -220,6 +222,7 @@ public class FireflyController
 		public FireflyThread(int nuid, String password, BrowserType type)
 		{
 			user = new TrueYou(nuid, password, type);
+			deadThread = new DetectDeadDriverThread(user, 4000);
 		}
 		
 		/**
@@ -227,19 +230,122 @@ public class FireflyController
 		 */
 		public void run()
 		{
-			boolean success = user.uploadHours(data);
-			if(!success)
+			deadThread.start();
+			int result = 0;
+			try
+			{
+				if(user.uploadHours(data))
+					result = 1;
+			}
+			catch(org.openqa.selenium.WebDriverException e)
+			{
+				result = 2;
+			}
+			if(result != 1)
 			{
 				user.closeDriver();
 			}
+			deadThread.stopThread();
+			int threadResult = result;
 			Platform.runLater(new Runnable() {
 				public void run()
 				{
-					if(!success)
+					if(threadResult == 0)
 						Main.alert("Invalid Credentials", AlertType.ERROR);
 					reset();
 				}
 			});
+		}
+	}
+	
+	/**
+	 * A thread responsible for checking up on the WebDriver if
+	 * it dies, and will reset the start button if the WebDriver
+	 * dies unexpectingly.
+	 * @author colli
+	 *
+	 */
+	private class DetectDeadDriverThread extends Thread
+	{
+		/**
+		 * The current user of the WebDriver.
+		 */
+		private TrueYou user;
+		
+		/**
+		 * Whether this thread should stop.
+		 */
+		private boolean stopped;
+		
+		/**
+		 * The amount of time to wait before initially checking
+		 * the WebDriver.
+		 */
+		private long waitTime;
+		
+		/**
+		 * Sets the user and sets the wait time before
+		 * initially checking the WebDriver to 0 milliseconds.
+		 * @param user WebDriver user
+		 */
+		public DetectDeadDriverThread(TrueYou user)
+		{
+			this(user, 0);
+		}
+		
+		/**
+		 * Sets the user and sets the wait time before
+		 * initially checking the WebDriver to the given wait time.
+		 * @param user WebDriver user
+		 * @param waitTime time to wait before initially checking
+		 * the WebDriver.
+		 */
+		public DetectDeadDriverThread(TrueYou user, long waitTime)
+		{
+			this.user = user;
+			this.waitTime = waitTime;
+		}
+		
+		/**
+		 * Stops this current thread.
+		 */
+		public void stopThread()
+		{
+			stopped = true;
+		}
+		
+		/**
+		 * Runs this current thread.
+		 */
+		public void run()
+		{
+			try
+			{
+				Thread.sleep(waitTime);
+			} catch (InterruptedException e1)
+			{
+				return;
+			}
+			while(!stopped)
+			{
+				try
+				{
+					Thread.sleep(500);
+				} catch (InterruptedException e)
+				{
+					return;
+				}
+				if(user.isDriverDead())
+				{
+					Platform.runLater(new Runnable() {
+						public void run()
+						{
+							reset();
+						}
+					});
+					stopped = true;
+				}
+			}			
 		}
 	}
 }
