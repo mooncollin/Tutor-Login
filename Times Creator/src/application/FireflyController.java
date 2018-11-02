@@ -321,7 +321,7 @@ public class FireflyController
 		{
 			try
 			{
-				Thread.sleep(waitTime);
+				Thread.sleep(waitTime + 2000);
 			} catch (InterruptedException e1)
 			{
 				return;
