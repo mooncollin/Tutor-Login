@@ -77,6 +77,11 @@ public class DriverUser
 		return driver == null || driver.toString().contains("null");
 	}
 	
+	public WebDriver getDriver()
+	{
+		return driver;
+	}
+	
 	/**
 	 * Starts the driver if it not already started, and will go to the specified
 	 * URL.

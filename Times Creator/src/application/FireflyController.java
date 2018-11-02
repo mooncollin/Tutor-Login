@@ -13,6 +13,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import selenium.BrowserType;
 import javafx.scene.control.Alert.AlertType;
+import util.DetectDeadDriverThread;
+import util.DriverThread;
 import util.OSSettings;
 import util.Shift;
 
@@ -204,7 +206,7 @@ public class FireflyController
 	 * @author colli
 	 *
 	 */
-	private class FireflyThread extends Thread
+	private class FireflyThread extends DriverThread
 	{
 		/**
 		 * The current user for Firefly.
@@ -221,8 +223,9 @@ public class FireflyController
 		 */
 		public FireflyThread(int nuid, String password, BrowserType type)
 		{
+			super(null);
 			user = new TrueYou(nuid, password, type);
-			deadThread = new DetectDeadDriverThread(user, 4000);
+			deadThread = new DetectDeadDriverThread(this);
 		}
 		
 		/**
@@ -231,121 +234,38 @@ public class FireflyController
 		public void run()
 		{
 			deadThread.start();
-			int result = 0;
+			int result = 0; // Login Credentials assumed to be wrong
 			try
 			{
 				if(user.uploadHours(data))
-					result = 1;
+					result = 1; // Login Credentials are correct
 			}
 			catch(org.openqa.selenium.WebDriverException e)
 			{
-				result = 2;
+				result = 2; // Driver was closed during the process
 			}
 			if(result != 1)
 			{
 				user.closeDriver();
 			}
-			deadThread.stopThread();
+			this.reset();
 			int threadResult = result;
-			Platform.runLater(new Runnable() {
-				public void run()
-				{
-					if(threadResult == 0)
-						Main.alert("Invalid Credentials", AlertType.ERROR);
-					reset();
-				}
+			Platform.runLater(() ->
+			{
+				if(threadResult == 0)
+					Main.alert("Invalid Credentials", AlertType.ERROR);
+			});
+		}
+		
+		protected void reset()
+		{
+			deadThread.stopThread();
+			Platform.runLater(() ->
+			{
+				FireflyController.this.reset();
 			});
 		}
 	}
 	
-	/**
-	 * A thread responsible for checking up on the WebDriver if
-	 * it dies, and will reset the start button if the WebDriver
-	 * dies unexpectingly.
-	 * @author colli
-	 *
-	 */
-	private class DetectDeadDriverThread extends Thread
-	{
-		/**
-		 * The current user of the WebDriver.
-		 */
-		private TrueYou user;
-		
-		/**
-		 * Whether this thread should stop.
-		 */
-		private boolean stopped;
-		
-		/**
-		 * The amount of time to wait before initially checking
-		 * the WebDriver.
-		 */
-		private long waitTime;
-		
-		/**
-		 * Sets the user and sets the wait time before
-		 * initially checking the WebDriver to 0 milliseconds.
-		 * @param user WebDriver user
-		 */
-		public DetectDeadDriverThread(TrueYou user)
-		{
-			this(user, 0);
-		}
-		
-		/**
-		 * Sets the user and sets the wait time before
-		 * initially checking the WebDriver to the given wait time.
-		 * @param user WebDriver user
-		 * @param waitTime time to wait before initially checking
-		 * the WebDriver.
-		 */
-		public DetectDeadDriverThread(TrueYou user, long waitTime)
-		{
-			this.user = user;
-			this.waitTime = waitTime;
-		}
-		
-		/**
-		 * Stops this current thread.
-		 */
-		public void stopThread()
-		{
-			stopped = true;
-		}
-		
-		/**
-		 * Runs this current thread.
-		 */
-		public void run()
-		{
-			try
-			{
-				Thread.sleep(waitTime + 2000);
-			} catch (InterruptedException e1)
-			{
-				return;
-			}
-			while(!stopped)
-			{
-				try
-				{
-					Thread.sleep(500);
-				} catch (InterruptedException e)
-				{
-					return;
-				}
-				if(user.isDriverDead())
-				{
-					Platform.runLater(new Runnable() {
-						public void run()
-						{
-							reset();
-						}
-					});
-					stopped = true;
-				}
-			}			
-		}
-	}
+	
 }

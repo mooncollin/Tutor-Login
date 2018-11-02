@@ -19,6 +19,8 @@ import javafx.scene.control.Alert.AlertType;
 import selenium.BrowserType;
 import javafx.scene.control.Button;
 import tutorlogin.Tutor;
+import util.DetectDeadDriverThread;
+import util.DriverThread;
 import util.OSSettings;
 import util.Shift;
 
@@ -233,12 +235,14 @@ public class TutorLoginController
 	 * @author colli
 	 *
 	 */
-	private class TutorTimedLoginThread extends Thread
+	private class TutorTimedLoginThread extends DriverThread
 	{
 		/**
 		 * The tutor to login and logout.
 		 */
 		private Tutor tutor;
+		
+		private DetectDeadDriverThread deadThread;
 		
 		/**
 		 * Creates a tutor from parameters.
@@ -250,7 +254,18 @@ public class TutorLoginController
 		public TutorTimedLoginThread(String emailIn, 
 				String netIDIn, String passwordIn, BrowserType type)
 		{
+			super(null);
 			tutor = new Tutor(netIDIn, passwordIn, emailIn, type);
+			deadThread = new DetectDeadDriverThread(this);
+		}
+		
+		protected void reset()
+		{
+			deadThread.stopThread();
+			tutor.closeDriver();
+			Platform.runLater(() ->{
+				TutorLoginController.this.reset();
+			});
 		}
 		
 		/**
@@ -258,31 +273,25 @@ public class TutorLoginController
 		 */
 		public void run()
 		{
+			deadThread.start();
 			try
 			{
-				Platform.runLater(new Runnable() {
-					public void run()
-					{
-						loginOutput.appendText("Checking Credentials...\n");
-					}
+				Platform.runLater(() ->
+				{
+					loginOutput.appendText("Checking Credentials...\n");
 				});
 				if(!tutor.checkCredentials())
 				{
-					tutor.closeDriver();
-					Platform.runLater(new Runnable() {
-						public void run()
-						{
-							reset();
-							loginOutput.appendText("Invalid Credentials\n");
-						}
+					this.reset();
+					Platform.runLater(() ->
+					{
+						loginOutput.appendText("Invalid Credentials\n");
 					});
 					return;
 				}
-				Platform.runLater(new Runnable() {
-					public void run()
-					{
-						loginOutput.appendText("Credentials Correct!\n");
-					}
+				Platform.runLater(() ->
+				{
+					loginOutput.appendText("Credentials Correct!\n");
 				});
 				tutor.closeDriver();
 				while(true)
@@ -335,13 +344,10 @@ public class TutorLoginController
 			}
 			catch(InterruptedException | org.openqa.selenium.WebDriverException e)
 			{
-				tutor.closeDriver();
-				Platform.runLater(new Runnable() {
-					public void run()
-					{
-						reset();
-						loginOutput.appendText("Error Occured\n");
-					}
+				this.reset();
+				Platform.runLater(() ->
+				{
+					loginOutput.appendText("Error Occured\n");
 				});
 				return;
 			}
