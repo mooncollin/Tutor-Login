@@ -1,15 +1,8 @@
 package application;
 
-import java.time.Duration;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.TextStyle;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
@@ -17,10 +10,8 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 import selenium.BrowserType;
+import tutorlogin.TutorTimedLoginThread;
 import javafx.scene.control.Button;
-import tutorlogin.Tutor;
-import util.DetectDeadDriverThread;
-import util.DriverThread;
 import util.OSSettings;
 import util.Shift;
 
@@ -35,7 +26,7 @@ public class TutorLoginController
 	/**
 	 * Output log of the "tutor login" thread.
 	 */
-	@FXML
+	@FXML 
 	private TextArea loginOutput;
 	
 	/**
@@ -203,7 +194,8 @@ public class TutorLoginController
 		loginOutput.clear();
 		emailField.getParent().setDisable(true);
 		button.setText("Stop");
-		tutorThread = new TutorTimedLoginThread(emailField.getText(), 
+		tutorThread = new TutorTimedLoginThread(this, dayData, 
+				loginOutput, emailField.getText(), 
 				netIDField.getText(), passwordField.getText(), 
 				BrowserType.browserNameToEnum(OSSettings.getDefaultBrowser()));
 		tutorThread.start();
@@ -216,7 +208,7 @@ public class TutorLoginController
 	{
 		if(tutorThread != null && tutorThread.isAlive())
 		{
-			tutorThread.tutor.closeDriver();
+			tutorThread.getDriverUser().closeDriver();
 			tutorThread.interrupt();
 		}
 	}
@@ -224,133 +216,9 @@ public class TutorLoginController
 	/**
 	 * Reset the fields back to normal and the button back to "start".
 	 */
-	private void reset()
+	public void reset()
 	{
 		startLoginButton.setText("Start");
 		emailField.getParent().setDisable(false);
-	}
-	
-	/**
-	 * Thread that is the "tutor login" process.
-	 * @author colli
-	 *
-	 */
-	private class TutorTimedLoginThread extends DriverThread
-	{
-		/**
-		 * The tutor to login and logout.
-		 */
-		private Tutor tutor;
-		
-		private DetectDeadDriverThread deadThread;
-		
-		/**
-		 * Creates a tutor from parameters.
-		 * @param emailIn tutor email
-		 * @param netIDIn tutor netID
-		 * @param passwordIn tutor password
-		 * @param type type of browser to use when logging in or out
-		 */
-		public TutorTimedLoginThread(String emailIn, 
-				String netIDIn, String passwordIn, BrowserType type)
-		{
-			super(null);
-			tutor = new Tutor(netIDIn, passwordIn, emailIn, type);
-			deadThread = new DetectDeadDriverThread(this);
-		}
-		
-		protected void reset()
-		{
-			deadThread.stopThread();
-			tutor.closeDriver();
-			Platform.runLater(() ->{
-				TutorLoginController.this.reset();
-			});
-		}
-		
-		/**
-		 * The "tutor login" process.
-		 */
-		public void run()
-		{
-			deadThread.start();
-			try
-			{
-				Platform.runLater(() ->
-				{
-					loginOutput.appendText("Checking Credentials...\n");
-				});
-				if(!tutor.checkCredentials())
-				{
-					this.reset();
-					Platform.runLater(() ->
-					{
-						loginOutput.appendText("Invalid Credentials\n");
-					});
-					return;
-				}
-				Platform.runLater(() ->
-				{
-					loginOutput.appendText("Credentials Correct!\n");
-				});
-				tutor.closeDriver();
-				while(true)
-				{
-					LocalDateTime now;
-					LocalDateTime later;
-					Duration waitDuration;
-					String weekdayToday = LocalDate.now()
-										  .getDayOfWeek()
-										  .getDisplayName(TextStyle.FULL, Locale.ENGLISH);
-					boolean noShifts = true;
-					for(Shift shift : dayData.get(weekdayToday))
-					{
-						if(shift == null)
-						{
-							continue;
-						}
-						noShifts = false;
-						now = LocalDateTime.now();
-						later = LocalDateTime.of(LocalDate.now(), shift.getStart());
-						waitDuration = Duration.between(now, later);
-						if(waitDuration.toMillis() > 0)
-						{
-							loginOutput.appendText(String.format("Need to wait %d seconds until work!\n", waitDuration.toSeconds()));
-							Thread.sleep(waitDuration.toMillis());
-							loginOutput.appendText("Time to work!\n");
-							tutor.working(true);
-							now = LocalDateTime.now();
-							later = LocalDateTime.of(LocalDate.now(), shift.getStop());
-							waitDuration = Duration.between(now, later);
-							loginOutput.appendText(String.format("Need to wait %d seconds until off work!\n", waitDuration.toSeconds()));
-							Thread.sleep(waitDuration.toMillis());
-							loginOutput.appendText("Time to leave work!\n");
-							tutor.working(false);
-						}
-					}
-					if(noShifts)
-					{
-						loginOutput.appendText("You do not have work today\n");
-					}
-					else
-					{
-						loginOutput.appendText("We are done with the day\n");
-					}
-					now = LocalDateTime.now();
-					later = LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.MIDNIGHT);
-					waitDuration = Duration.between(now, later);
-					Thread.sleep(waitDuration.toMillis());
-				}
-			}
-			catch(InterruptedException | org.openqa.selenium.WebDriverException e)
-			{
-				this.reset();
-				Platform.runLater(() ->
-				{
-					loginOutput.appendText("Error Occured\n");
-				});
-				return;
-			}
-		}
 	}
 }

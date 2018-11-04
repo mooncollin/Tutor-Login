@@ -49,6 +49,26 @@ public class ShiftPane
 	private static final Pattern UNALLOWED_CHARACTERS_TEXTFIELD_PATTERN = Pattern.compile("[^1234567890:]");
 	
 	/**
+	 * A regex pattern for a bad full time format.
+	 */
+	private static final Pattern TIME_FORMAT_BAD = Pattern.compile("\\d{2,}:\\d{3,}");
+	
+	/**
+	 * A regex pattern for a bad full time format.
+	 */
+	private static final Pattern TIME_FORMAT_BAD2 = Pattern.compile("\\d{3,}:\\d{2,}");
+	
+	/**
+	 * A regex pattern for a bad front time format.
+	 */
+	private static final Pattern FRONT_TIME_FORMAT_BAD = Pattern.compile("\\d{3,}");
+	
+	/**
+	 * A regex pattern for a bad back time format.
+	 */
+	private static final Pattern BACK_TIME_FORMAT_BAD = Pattern.compile(":\\d{3,}");
+	
+	/**
 	 * A text filter that catches incoming changes to a text field and manipulates the text before it is sent to
 	 * any key pressed/typed listeners and onto the screen. This is used to block unwanted characters.
 	 */
@@ -63,30 +83,41 @@ public class ShiftPane
 			{
 				result = null;
 			}
-			else if(newText.equals(":"))
+			else if(FRONT_TIME_FORMAT_BAD.matcher(possibleNewText).matches())
 			{
-				if(change.getControlText().contains(":"))
-				{
-					result = null;
-				}
-				else if(change.getControlText().isEmpty())
-				{
-					result = null;
-				}
+				result = null;
+			}
+			else if(BACK_TIME_FORMAT_BAD.matcher(possibleNewText).matches())
+			{
+				result = null;
+			}
+			else if(TIME_FORMAT_BAD.matcher(possibleNewText).matches()
+					|| TIME_FORMAT_BAD2.matcher(possibleNewText).matches())
+			{
+				result = null;
 			}
 			else if(!possibleNewText.isEmpty())
 			{
-				
 				String[] hourAndMinute = possibleNewText.split(":");
-				int hour = Integer.parseInt(hourAndMinute[0]);
-				if(hour >= 24)
+				if(hourAndMinute.length > 0)
 				{
-					result = null;
+					if(hourAndMinute[0].equals(""))
+					{
+						result = null;
+					}
+					else
+					{
+						int hour = Integer.valueOf(hourAndMinute[0]);
+						if(hour < 0 || hour > 23)
+						{
+							result = null;
+						}
+					}
 				}
 				if(hourAndMinute.length > 1)
 				{
-					int minute = Integer.parseInt(hourAndMinute[1]);
-					if(minute >= 60)
+					int minute = Integer.valueOf(hourAndMinute[1]);
+					if(minute < 0 || minute > 59)
 					{
 						result = null;
 					}

@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
-import firefly.TrueYou;
-import javafx.application.Platform;
+
+import firefly.FireflyThread;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -13,8 +13,6 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextFormatter;
 import selenium.BrowserType;
 import javafx.scene.control.Alert.AlertType;
-import util.DetectDeadDriverThread;
-import util.DriverThread;
 import util.OSSettings;
 import util.Shift;
 
@@ -169,21 +167,21 @@ public class FireflyController
 		{
 			passwordField.getParent().setDisable(true);
 			button.setText("Stop");
-			fireflyThread = new FireflyThread(getNUID(), getPassword(),
+			fireflyThread = new FireflyThread(this, data, getNUID(), getPassword(),
 					BrowserType.browserNameToEnum(OSSettings.getDefaultBrowser()));
 			fireflyThread.start();
 		}
 		else
 		{
 			reset();
-			this.stopThread();
+			stopThread();
 		}
 	}
 	
 	/**
 	 * Reset the fields back to normal and the button back to "start".
 	 */
-	private void reset()
+	public void reset()
 	{
 		startButton.setText("Start");
 		passwordField.getParent().setDisable(false);
@@ -196,74 +194,8 @@ public class FireflyController
 	{
 		if(fireflyThread != null)
 		{
-			fireflyThread.user.closeDriver();
+			fireflyThread.getDriverUser().closeDriver();
 			fireflyThread.interrupt();
-		}
-	}
-	
-	/**
-	 * A thread responsible for running the "firefly process".
-	 * @author colli
-	 *
-	 */
-	private class FireflyThread extends DriverThread
-	{
-		/**
-		 * The current user for Firefly.
-		 */
-		private TrueYou user;
-		
-		private DetectDeadDriverThread deadThread;
-		
-		/**
-		 * Creates a TrueYou user from the given parameters.
-		 * @param nuid user's nuid.
-		 * @param password user's password.
-		 * @param type the browser type to use with selenium.
-		 */
-		public FireflyThread(int nuid, String password, BrowserType type)
-		{
-			super(null);
-			user = new TrueYou(nuid, password, type);
-			deadThread = new DetectDeadDriverThread(this);
-		}
-		
-		/**
-		 * Runs the "firefly process".
-		 */
-		public void run()
-		{
-			deadThread.start();
-			int result = 0; // Login Credentials assumed to be wrong
-			try
-			{
-				if(user.uploadHours(data))
-					result = 1; // Login Credentials are correct
-			}
-			catch(org.openqa.selenium.WebDriverException e)
-			{
-				result = 2; // Driver was closed during the process
-			}
-			if(result != 1)
-			{
-				user.closeDriver();
-			}
-			this.reset();
-			int threadResult = result;
-			Platform.runLater(() ->
-			{
-				if(threadResult == 0)
-					Main.alert("Invalid Credentials", AlertType.ERROR);
-			});
-		}
-		
-		protected void reset()
-		{
-			deadThread.stopThread();
-			Platform.runLater(() ->
-			{
-				FireflyController.this.reset();
-			});
 		}
 	}
 	
