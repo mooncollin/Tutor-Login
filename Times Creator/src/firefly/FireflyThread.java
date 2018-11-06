@@ -2,14 +2,13 @@ package firefly;
 
 import java.util.HashMap;
 import java.util.List;
-
-import application.FireflyController;
 import application.Main;
 import javafx.application.Platform;
 import javafx.scene.control.Alert.AlertType;
 import selenium.BrowserType;
 import selenium.DetectDeadDriverThread;
 import selenium.DriverThread;
+import util.Procedure;
 import util.Shift;
 
 /**
@@ -20,9 +19,9 @@ import util.Shift;
 public class FireflyThread extends DriverThread<TrueYou>
 {
 	/**
-	 * The controller creating this thread.
+	 * A function that runs when this thread's process is done.
 	 */
-	private final FireflyController fireflyController;
+	private final Procedure resetProcedure;
 	
 	/**
 	 * The shift data.
@@ -37,12 +36,12 @@ public class FireflyThread extends DriverThread<TrueYou>
 	 * @param fireflyController the controller creating this thread.
 	 * @param data shift data.
 	 */
-	public FireflyThread(FireflyController fireflyController,
+	public FireflyThread(Procedure givenProcedure,
 			HashMap<String, List<Shift>> data,
 			int nuid, String password, BrowserType type)
 	{
 		super(new TrueYou(nuid, password, type));
-		this.fireflyController = fireflyController;
+		this.resetProcedure = givenProcedure;
 		deadThread = new DetectDeadDriverThread<TrueYou>(this);
 		this.data = data;
 	}
@@ -75,13 +74,13 @@ public class FireflyThread extends DriverThread<TrueYou>
 		
 	}
 	
+	/**
+	 * Stops the dead thread and triggers the reset procedure.
+	 */
 	protected void reset()
 	{
 		deadThread.stopThread(); // Stops asking whether the WebDriver is dead.
-		Platform.runLater(() ->
-		{
-			fireflyController.reset(); // Resets the Start button
-		});
+		resetProcedure.run();
 	}
 	
 	/**

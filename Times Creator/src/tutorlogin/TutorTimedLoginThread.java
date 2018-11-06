@@ -8,13 +8,12 @@ import java.time.format.TextStyle;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-
-import application.TutorLoginController;
 import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 import selenium.BrowserType;
 import selenium.DetectDeadDriverThread;
 import selenium.DriverThread;
+import util.Procedure;
 import util.Shift;
 
 /**
@@ -25,9 +24,9 @@ import util.Shift;
 public class TutorTimedLoginThread extends DriverThread<Tutor>
 {
 	/**
-	 * The controller that calls this thread.
+	 * A function to run when this threads needs to stop.
 	 */
-	private final TutorLoginController tutorLoginController;
+	private final Procedure resetProcedure;
 	
 	/**
 	 * The shift data.
@@ -48,13 +47,13 @@ public class TutorTimedLoginThread extends DriverThread<Tutor>
 	 * @param tutorLoginController the controller creating this thread
 	 * @param dayData shift data
 	 */
-	public TutorTimedLoginThread(TutorLoginController tutorLoginController, 
+	public TutorTimedLoginThread(Procedure givenProcedure, 
 			HashMap<String, List<Shift>> dayData, TextArea loginOutput,
 			String emailIn, String netIDIn, String passwordIn, BrowserType type)
 	{
 		super(new Tutor(netIDIn, passwordIn, emailIn, type));
-		this.tutorLoginController = tutorLoginController;
 		deadThread = new DetectDeadDriverThread<Tutor>(this);
+		this.resetProcedure = givenProcedure;
 		this.loginOutput = loginOutput;
 		this.dayData = dayData;
 	}
@@ -63,16 +62,13 @@ public class TutorTimedLoginThread extends DriverThread<Tutor>
 	{
 		deadThread.stopThread();
 		getDriverUser().closeDriver();
-		Platform.runLater(() ->
-		{
-			this.tutorLoginController.reset();
-		});
+		resetProcedure.run();
 	}
 	
 	/**
 	 * Check the credentials of this tutor.
 	 */
-	private void credentialsCheck()
+	private boolean credentialsCheck()
 	{
 		Platform.runLater(() ->
 		{
@@ -80,18 +76,18 @@ public class TutorTimedLoginThread extends DriverThread<Tutor>
 		});
 		if(!getDriverUser().checkCredentials())
 		{
-			reset();
 			Platform.runLater(() ->
 			{
 				loginOutput.appendText("Invalid Credentials\n");
 			});
-			return;
+			return false;
 		}
 		Platform.runLater(() ->
 		{
 			loginOutput.appendText("Credentials Correct!\n");
 		});
 		getDriverUser().closeDriver();
+		return true;
 	}
 	
 	/**
@@ -99,12 +95,16 @@ public class TutorTimedLoginThread extends DriverThread<Tutor>
 	 */
 	public void run()
 	{
-		deadThread.start();
 		try
 		{
 			if(isInterrupted())
 				throw new InterruptedException();
-			credentialsCheck();
+			if(!credentialsCheck())
+			{
+				reset();
+				return;
+			}
+			deadThread.start();
 			while(true)
 			{
 				if(isInterrupted())
@@ -159,14 +159,17 @@ public class TutorTimedLoginThread extends DriverThread<Tutor>
 				Thread.sleep(waitDuration.toMillis());
 			}
 		}
-		catch(InterruptedException | org.openqa.selenium.WebDriverException e)
+		catch(org.openqa.selenium.WebDriverException e)
 		{
 			reset();
 			Platform.runLater(() ->
 			{
 				loginOutput.appendText("Error Occured\n");
 			});
-			return;
+		}
+		catch(InterruptedException e)
+		{
+			reset();
 		}
 	}
 }

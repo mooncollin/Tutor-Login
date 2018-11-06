@@ -3,6 +3,7 @@ package application;
 import java.util.HashMap;
 import java.util.List;
 
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.PasswordField;
@@ -13,6 +14,7 @@ import selenium.BrowserType;
 import tutorlogin.TutorTimedLoginThread;
 import javafx.scene.control.Button;
 import util.OSSettings;
+import util.Procedure;
 import util.Shift;
 
 /**
@@ -23,6 +25,12 @@ import util.Shift;
  */
 public class TutorLoginController
 {
+	private final Procedure THREAD_RESET_PROCEDURE = () -> {
+		Platform.runLater(() -> {
+			reset();
+		});
+	};
+	
 	/**
 	 * Output log of the "tutor login" thread.
 	 */
@@ -194,7 +202,7 @@ public class TutorLoginController
 		loginOutput.clear();
 		emailField.getParent().setDisable(true);
 		button.setText("Stop");
-		tutorThread = new TutorTimedLoginThread(this, dayData, 
+		tutorThread = new TutorTimedLoginThread(THREAD_RESET_PROCEDURE, dayData, 
 				loginOutput, emailField.getText(), 
 				netIDField.getText(), passwordField.getText(), 
 				BrowserType.browserNameToEnum(OSSettings.getDefaultBrowser()));

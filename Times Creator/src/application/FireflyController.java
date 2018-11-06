@@ -6,6 +6,7 @@ import java.util.function.UnaryOperator;
 import java.util.regex.Pattern;
 
 import firefly.FireflyThread;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -14,6 +15,7 @@ import javafx.scene.control.TextFormatter;
 import selenium.BrowserType;
 import javafx.scene.control.Alert.AlertType;
 import util.OSSettings;
+import util.Procedure;
 import util.Shift;
 
 /**
@@ -55,6 +57,16 @@ public class FireflyController
 			
 			return result;
 		}
+	};
+	
+	/**
+	 * A function to run when the FireflyThread is done doing
+	 * its job.
+	 */
+	private final Procedure THREAD_RESET_PROCEDURE = () -> {
+		Platform.runLater(() -> {
+			reset();
+		});
 	};
 	
 	/**
@@ -167,7 +179,7 @@ public class FireflyController
 		{
 			passwordField.getParent().setDisable(true);
 			button.setText("Stop");
-			fireflyThread = new FireflyThread(this, data, getNUID(), getPassword(),
+			fireflyThread = new FireflyThread(THREAD_RESET_PROCEDURE, data, getNUID(), getPassword(),
 					BrowserType.browserNameToEnum(OSSettings.getDefaultBrowser()));
 			fireflyThread.start();
 		}
