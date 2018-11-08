@@ -80,7 +80,7 @@ public class DetectDeadDriverThread<T extends DriverUser> extends Thread
 			{
 				return;
 			}
-			if(driverThread.getDriverUser().isDriverDead())
+			if(!stopped && driverThread.getDriverUser().isDriverDead())
 			{
 				driverThread.reset();
 				stopped = true;

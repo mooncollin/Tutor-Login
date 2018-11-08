@@ -99,12 +99,14 @@ public class TutorTimedLoginThread extends DriverThread<Tutor>
 		{
 			if(isInterrupted())
 				throw new InterruptedException();
+			deadThread.start();
 			if(!credentialsCheck())
 			{
 				reset();
 				return;
 			}
-			deadThread.start();
+			deadThread.stopThread();
+			deadThread = new DetectDeadDriverThread<Tutor>(this);
 			while(true)
 			{
 				if(isInterrupted())
@@ -133,7 +135,10 @@ public class TutorTimedLoginThread extends DriverThread<Tutor>
 						loginOutput.appendText("Time to work!\n");
 						if(isInterrupted())
 							throw new InterruptedException();
+						deadThread.start();
 						getDriverUser().working(true);
+						deadThread.stopThread();
+						deadThread = new DetectDeadDriverThread<Tutor>(this);
 						now = LocalDateTime.now();
 						later = LocalDateTime.of(LocalDate.now(), shift.getStop());
 						waitDuration = Duration.between(now, later);
@@ -142,7 +147,10 @@ public class TutorTimedLoginThread extends DriverThread<Tutor>
 						loginOutput.appendText("Time to leave work!\n");
 						if(isInterrupted())
 							throw new InterruptedException();
+						deadThread.start();
 						getDriverUser().working(false);
+						deadThread.stopThread();
+						deadThread = new DetectDeadDriverThread<Tutor>(this);
 					}
 				}
 				if(noShifts)
