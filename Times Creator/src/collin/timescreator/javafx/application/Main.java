@@ -20,22 +20,22 @@ public class Main extends Application
 	/**
 	 * Main FXML file that will be the first window shown.
 	 */
-	public static final String MAIN_FXML = "/resources/fxml/Layout.fxml";
+	public static final String MAIN_FXML = "/collin/timescreator/javafx/resources/fxml/Layout.fxml";
 	
 	/**
 	 * Tutor Login window FXML file.
 	 */
-	public static final String TUTOR_LOGIN_FXML = "/resources/fxml/TutorLoginLayout.fxml";
+	public static final String TUTOR_LOGIN_FXML = "/collin/timescreator/javafx/resources/fxml/TutorLoginLayout.fxml";
 	
 	/**
 	 * About window FXML file.
 	 */
-	public static final String ABOUT_FXML = "/resources/fxml/About.fxml";
+	public static final String ABOUT_FXML = "/collin/timescreator/javafx/resources/fxml/About.fxml";
 	
 	/**
 	 * Firefly window FXML file.
 	 */
-	public static final String FIREFLY_FXML = "/resources/fxml/Firefly.fxml";
+	public static final String FIREFLY_FXML = "/collin/timescreator/javafx/resources/fxml/Firefly.fxml";
 	
 	/**
 	 * If a non-user error occurs, this will be the default error message shown to the user.
@@ -45,7 +45,7 @@ public class Main extends Application
 	/**
 	 * List of main CSS files.
 	 */
-	public static final List<String> MAIN_CSS = List.of("/resources/css/application.css");
+	public static final List<String> MAIN_CSS = List.of("/collin/timescreator/javafx/resources/css/application.css");
 	
 	/**
 	 * A flag to set whether debug mode should be on. This enables logging for various
