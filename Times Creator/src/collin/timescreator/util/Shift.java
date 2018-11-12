@@ -1,0 +1,101 @@
+package collin.timescreator.util;
+
+import java.time.LocalTime;
+
+/**
+ * Contains information about a shift's start and stop time.
+ * @author colli
+ *
+ */
+public class Shift
+{
+	/**
+	 * Start time of this shift.
+	 */
+	private LocalTime start;
+	
+	/**
+	 * Stop time of this shift.
+	 */
+	private LocalTime stop;
+	
+	/**
+	 * Attempts to take a start and stop string and parse them for their time.
+	 * Each one is split by a ':' character and each side of the ':' character
+	 * is parsed for their integer value. The first number must be within the
+	 * 24 hour range and the second number must be within the 60 minute range.
+	 * @param startStr start time as a string
+	 * @param stopStr stop time as a string
+	 */
+	public Shift(String startStr, String stopStr)
+	{
+		String[] startData = startStr.split(":");
+		String[] stopData = stopStr.split(":");
+		if(startData.length == 1)
+		{
+			setStart(Integer.parseInt(startData[0]), 0);
+		}
+		else
+		{
+			setStart(Integer.parseInt(startData[0]), Integer.parseInt(startData[1]));
+		}
+		if(stopData.length == 1)
+		{
+			setStop(Integer.parseInt(stopData[0]), 0);
+		}
+		else
+		{
+			setStop(Integer.parseInt(stopData[0]), Integer.parseInt(stopData[1]));
+		}
+		
+	}
+	
+	/**
+	 * Sets the start time.
+	 * @param hour hour to set
+	 * @param minute minute to set
+	 */
+	public void setStart(int hour, int minute)
+	{
+		start = LocalTime.of(hour, minute);
+	}
+	
+	/**
+	 * Sets the stop time.
+	 * @param hour hour to set
+	 * @param minute minute to set
+	 */
+	public void setStop(int hour, int minute)
+	{
+		stop = LocalTime.of(hour, minute);
+	}
+	
+	/**
+	 * Gets the start time.
+	 * @return start time
+	 */
+	public LocalTime getStart()
+	{
+		return start;
+	}
+	
+	/**
+	 * Gets the stop time.
+	 * @return stop time
+	 */
+	public LocalTime getStop()
+	{
+		return stop;
+	}
+	
+	/**
+	 * This returns a string in the form HH:MM-HH:MM for
+	 * first the start and then the stop time.
+	 * @return a string representing this shift object. 
+	 */
+	@Override
+	public String toString()
+	{
+		return String.format("%s-%s", start, stop);
+	}
+}
