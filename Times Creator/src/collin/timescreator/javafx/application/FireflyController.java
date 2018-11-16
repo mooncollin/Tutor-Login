@@ -67,7 +67,6 @@ public class FireflyController
 	 */
 	private final Procedure THREAD_RESET_PROCEDURE = () ->
 	{
-		stopThread();
 		Platform.runLater(() -> {
 			reset();
 		});

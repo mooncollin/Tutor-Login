@@ -61,7 +61,7 @@ public class FireflyThread extends DriverThread<TrueYou>
 		}
 		if(result == LOGIN_RESULT.ERROR)
 		{
-			this.reset();
+			getDriverUser().closeDriver();
 		}
 		if(result == LOGIN_RESULT.INCORRECT)
 		{
@@ -71,6 +71,7 @@ public class FireflyThread extends DriverThread<TrueYou>
 				Main.alert("Invalid Credentials", AlertType.ERROR);
 			});
 		}
+		this.reset();
 	}
 	
 	/**
