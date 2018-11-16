@@ -8,7 +8,9 @@ import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.opera.OperaDriver;
 import org.openqa.selenium.safari.SafariDriver;
 
-public class DriverUser
+import collin.timescreator.util.Procedure;
+
+abstract public class DriverUser
 {
 	/**
 	 * The current WebDriver.
@@ -21,6 +23,27 @@ public class DriverUser
 	protected BrowserType browserType; 
 	
 	/**
+	 * A Procedure to run when this DriverUser attempts to perform
+	 * actions with a WebDriver, but the current WebDriver has been terminated.
+	 */
+	private Procedure deadProcedure;
+	
+	/**
+	 * A Procedure to run when this DriverUser is interrupted.
+	 */
+	private Procedure interruptedProcedure;
+	
+	/**
+	 * Tests whether the given WebDriver has been terminated.
+	 * @param driver a WebDriver
+	 * @return true if the driver is dead, false otherwise
+	 */
+	public static boolean isDriverDead(WebDriver driver)
+	{
+		return driver == null || driver.toString().contains("null");
+	}
+	
+	/**
 	 * Sets the browser to the given browser type
 	 * and constructs this object.
 	 * @param browserType a browser type to use
@@ -29,6 +52,44 @@ public class DriverUser
 	public DriverUser(BrowserType browserType)
 	{
 		setBrowserType(browserType);
+	}
+	
+	/**
+	 * Sets the procedure that will run when this DriverUser attempts to do 
+	 * an action when the WebDriver has been terminated.
+	 * @param action Procedure to run
+	 */
+	public void setDeadProcedure(Procedure action)
+	{
+		this.deadProcedure = action;
+	}
+	
+	/**
+	 * Gets the dead driver Procedure.
+	 * @return dead driver procedure
+	 */
+	public Procedure getDeadProcedure()
+	{
+		return deadProcedure;
+	}
+	
+	/**
+	 * Gets the interrupt Procedure.
+	 * @return interrupt procedure
+	 */
+	public Procedure getInterruptProcedure()
+	{
+		return interruptedProcedure;
+	}
+	
+	/**
+	 * Sets the procedure that will run when this DriverUser attemps to do 
+	 * an action when it is interrupted.
+	 * @param action
+	 */
+	public void setInterruptProcedure(Procedure action)
+	{
+		this.interruptedProcedure = action;
 	}
 	
 	/**
@@ -56,7 +117,7 @@ public class DriverUser
 	 */
 	public void closeDriver()
 	{
-		if(driver != null && !driver.toString().contains("null"))
+		if(!isDriverDead(driver))
 		{
 			try
 			{
@@ -69,14 +130,9 @@ public class DriverUser
 	}
 	
 	/**
-	 * Checks whether the current driver is not longer active.
-	 * @return true if dead, false otherwise.
+	 * Gets the current WebDriver.
+	 * @return the current WebDriver
 	 */
-	public boolean isDriverDead()
-	{
-		return driver == null || driver.toString().contains("null");
-	}
-	
 	public WebDriver getDriver()
 	{
 		return driver;
@@ -89,7 +145,7 @@ public class DriverUser
 	 */
 	protected void startDriver(String url)
 	{
-		if(driver == null || driver.toString().contains("null"))
+		if(isDriverDead(driver))
 			setDriver();
 		if(url != null)
 			driver.get(url);
@@ -127,4 +183,10 @@ public class DriverUser
 				driver = new ChromeDriver();
 		}
 	}
+	
+	/**
+	 * Method that can be called to interrupt the this DriverUser
+	 * and stop whatever is currently happening with the WebDriver.
+	 */
+	abstract public void interrupt();
 }

@@ -5,6 +5,8 @@ import java.util.List;
 
 import collin.timescreator.selenium.tutorlogin.TutorTimedLoginThread;
 import collin.timescreator.selenium.utils.BrowserType;
+import collin.timescreator.selenium.utils.DeadDriverException;
+import collin.timescreator.selenium.utils.DriverInterruptedException;
 import collin.timescreator.util.OSSettings;
 import collin.timescreator.util.Procedure;
 import collin.timescreator.util.Shift;
@@ -25,7 +27,13 @@ import javafx.scene.control.Button;
  */
 public class TutorLoginController
 {
-	private final Procedure THREAD_RESET_PROCEDURE = () -> {
+	/**
+	 * Procedure to run when the tutor thread is needing to reset
+	 * back to before running the process.
+	 */
+	private final Procedure THREAD_RESET_PROCEDURE = () ->
+	{
+		stopThread();
 		Platform.runLater(() -> {
 			reset();
 		});
@@ -169,6 +177,7 @@ public class TutorLoginController
 		}
 		else
 		{
+			tutorThread.getDriverUser().interrupt();
 			reset();
 			stopThread();
 		}
@@ -202,10 +211,13 @@ public class TutorLoginController
 		loginOutput.clear();
 		emailField.getParent().setDisable(true);
 		button.setText("Stop");
-		tutorThread = new TutorTimedLoginThread(THREAD_RESET_PROCEDURE, dayData, 
+		tutorThread = new TutorTimedLoginThread(dayData, 
 				loginOutput, emailField.getText(), 
 				netIDField.getText(), passwordField.getText(), 
 				BrowserType.browserNameToEnum(OSSettings.getDefaultBrowser()));
+		tutorThread.setResetProcedure(THREAD_RESET_PROCEDURE);
+		tutorThread.setDeadProcedure(DeadDriverException.deadDriverProcedure());
+		tutorThread.setInterruptProcedure(DriverInterruptedException.driverInterruptedProcedure());
 		tutorThread.start();
 	}
 	

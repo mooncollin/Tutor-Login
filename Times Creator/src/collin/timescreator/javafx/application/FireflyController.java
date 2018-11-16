@@ -7,6 +7,8 @@ import java.util.regex.Pattern;
 
 import collin.timescreator.selenium.firefly.FireflyThread;
 import collin.timescreator.selenium.utils.BrowserType;
+import collin.timescreator.selenium.utils.DeadDriverException;
+import collin.timescreator.selenium.utils.DriverInterruptedException;
 import collin.timescreator.util.OSSettings;
 import collin.timescreator.util.Procedure;
 import collin.timescreator.util.Shift;
@@ -63,7 +65,9 @@ public class FireflyController
 	 * A function to run when the FireflyThread is done doing
 	 * its job.
 	 */
-	private final Procedure THREAD_RESET_PROCEDURE = () -> {
+	private final Procedure THREAD_RESET_PROCEDURE = () ->
+	{
+		stopThread();
 		Platform.runLater(() -> {
 			reset();
 		});
@@ -179,12 +183,16 @@ public class FireflyController
 		{
 			passwordField.getParent().setDisable(true);
 			button.setText("Stop");
-			fireflyThread = new FireflyThread(THREAD_RESET_PROCEDURE, data, getNUID(), getPassword(),
+			fireflyThread = new FireflyThread(data, getNUID(), getPassword(),
 					BrowserType.browserNameToEnum(OSSettings.getDefaultBrowser()));
+			fireflyThread.setResetProcedure(THREAD_RESET_PROCEDURE);
+			fireflyThread.setDeadProcedure(DeadDriverException.deadDriverProcedure());
+			fireflyThread.setInterruptProcedure(DriverInterruptedException.driverInterruptedProcedure());
 			fireflyThread.start();
 		}
 		else
 		{
+			fireflyThread.getDriverUser().interrupt();
 			reset();
 			stopThread();
 		}

@@ -1,5 +1,7 @@
 package collin.timescreator.selenium.utils;
 
+import collin.timescreator.util.Procedure;
+
 /**
  * A thread who is specifically working with a DriverUser.
  * This helps detach the main application from the Selenium
@@ -8,7 +10,7 @@ package collin.timescreator.selenium.utils;
  * @author colli
  *
  */
-abstract public class DriverThread<T extends DriverUser> extends Thread
+public class DriverThread<T extends DriverUser> extends Thread
 {
 	/**
 	 * The current DriverUser.
@@ -16,11 +18,10 @@ abstract public class DriverThread<T extends DriverUser> extends Thread
 	private T driverUser;
 	
 	/**
-	 * A thread responsible for checking if the current WebDriver
-	 * is dead and will call the reset method of this DriverThread
-	 * when the WebDriver is dead.
+	 * Procedure to perform when this thread is needed to reset 
+	 * any state of the program.
 	 */
-	protected DetectDeadDriverThread<T> deadThread;
+	private Procedure resetProcedure;
 	
 	/**
 	 * Sets the DriverUser to the given one
@@ -29,7 +30,65 @@ abstract public class DriverThread<T extends DriverUser> extends Thread
 	public DriverThread(T driver)
 	{
 		setDriver(driver);
-		this.deadThread = new DetectDeadDriverThread<T>(this);
+	}
+	
+	/**
+	 * Sets the reset procedure
+	 * @param p Procedure to execute when this thread finishes its job. Set 
+	 * to null to not do anything.
+	 */
+	public void setResetProcedure(Procedure p)
+	{
+		this.resetProcedure = p;
+	}
+	
+	/**
+	 * Sets the DriverUser's dead driver procedure when the DriverUser attempts 
+	 * to perform WebDriver actions when the current WebDriver is dead.
+	 * @param p Procedure to execute when the WebDriver is dead and an action is requested 
+	 * to be performed. Set to null to not do anything.
+	 */
+	public void setDeadProcedure(Procedure p)
+	{
+		this.driverUser.setDeadProcedure(p);
+	}
+	
+	/**
+	 * Sets the DriverUser's interrupt procedure when the DriverUser attempts 
+	 * to perform WebDriver actions when it is currently interrupted.
+	 * @param p Procedure to execute when the DriverUser is interrupted and an action 
+	 * is requested to be performed. Set to null to not do anything.
+	 */
+	public void setInterruptProcedure(Procedure p)
+	{
+		this.driverUser.setInterruptProcedure(p);
+	}
+	
+	/**
+	 * Returns its reset procedure.
+	 * @return reset procedure
+	 */
+	public Procedure getResetProcedure()
+	{
+		return resetProcedure;
+	}
+	
+	/**
+	 * Returns the DriverUser's dead driver procedure.
+	 * @return dead driver procedure
+	 */
+	public Procedure getDeadProcedure()
+	{
+		return driverUser.getDeadProcedure();
+	}
+	
+	/**
+	 * Returns the DriverUser's interrupt procedure.
+	 * @return interrupt procedure
+	 */
+	public Procedure getInterruptProcedure()
+	{
+		return driverUser.getInterruptProcedure();
 	}
 	
 	/**
@@ -54,5 +113,9 @@ abstract public class DriverThread<T extends DriverUser> extends Thread
 	 * A method that is to be used when this current DriverThread
 	 * is done and certain elements on the GUI application needs to be reset.
 	 */
-	abstract protected void reset();
+	protected void reset()
+	{
+		if(resetProcedure != null)
+			resetProcedure.run();
+	}
 }

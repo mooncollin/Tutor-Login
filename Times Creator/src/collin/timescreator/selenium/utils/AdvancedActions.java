@@ -8,6 +8,8 @@ import java.util.List;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 
+import collin.timescreator.util.Procedure;
+
 /**
  * A collection of AdvancedActions that allows for specific chains
  * to be executed in different manners.
@@ -30,6 +32,23 @@ public class AdvancedActions implements Iterable<AdvancedAction>
 	 * The last failed action that failed to succeed when performed.
 	 */
 	private AdvancedAction lastFailedAction;
+	
+	/**
+	 * Procedure to perform when actions are requested to be performed, but 
+	 * the current WebDriver is dead.
+	 */
+	private Procedure deadAction;
+	
+	/**
+	 * Procedure to perform when actions are requested to be performed, but 
+	 * this object is currently interrupted.
+	 */
+	private Procedure interruptAction;
+	
+	/**
+	 * Interrupted flag.
+	 */
+	private boolean interrupted;
 	
 	/**
 	 * Creates an AdvancedActions based on a driver and a given sequence
@@ -74,6 +93,7 @@ public class AdvancedActions implements Iterable<AdvancedAction>
 	{
 		setDriver(driver);
 		setActions(actions);
+		interrupted = false;
 	}
 	
 	/**
@@ -83,6 +103,26 @@ public class AdvancedActions implements Iterable<AdvancedAction>
 	public void setDriver(WebDriver driver)
 	{
 		setDriver(driver, false);
+	}
+	
+	/**
+	 * Sets the action that will execute when attempting to perform actions 
+	 * find the current WebDriver to not be alive.
+	 * @param action Procedure
+	 */
+	public void setDeadAction(Procedure action)
+	{
+		this.deadAction = action;
+	}
+	
+	/**
+	 * Sets the action that will execute when attempting to perform actions 
+	 * and is currently interrupted.
+	 * @param action Procedure
+	 */
+	public void setInterruptAction(Procedure action)
+	{
+		this.interruptAction = action;
 	}
 	
 	/**
@@ -156,6 +196,33 @@ public class AdvancedActions implements Iterable<AdvancedAction>
 				return a;
 		}
 		return null;
+	}
+	
+	/**
+	 * Interrupts any further actions. The next call to perform actions will 
+	 * fail and instead run its interrupt action and then get reset back to 
+	 * an uniterrupted state.
+	 */
+	public void interrupt()
+	{
+		interrupted = true;
+	}
+	
+	/**
+	 * Checks if this AdvancedActions is currently interrupted.
+	 * @return true is it is interrupted, false otherwise
+	 */
+	public boolean isInterrupted()
+	{
+		return interrupted;
+	}
+	
+	/**
+	 * Undos the interruption method.
+	 */
+	public void uninterrupt()
+	{
+		interrupted = false;
 	}
 	
 	/**
@@ -233,7 +300,11 @@ public class AdvancedActions implements Iterable<AdvancedAction>
 	}
 	
 	/**
-	 * Perfoms all actions.
+	 * Perfoms all actions. If 
+	 * it is currently interrupted, it will attempt to run its interrupt action. If 
+	 * it is running through actions and gets interrupted, it will run its interrupt action 
+	 * before the next action will execute, and will stop executing actions from this call. If 
+	 * the driver is dead, then its dead action will execute, and no further actions will be executed.
 	 * @throws NullPointerException If the current driver is null
 	 * or the actions list is null.
 	 */
@@ -243,7 +314,11 @@ public class AdvancedActions implements Iterable<AdvancedAction>
 	}
 	
 	/**
-	 * Peforms actions from the start and up to an index (exclusive).
+	 * Peforms actions from the start and up to an index (exclusive). If 
+	 * it is currently interrupted, it will attempt to run its interrupt action. If 
+	 * it is running through actions and gets interrupted, it will run its interrupt action 
+	 * before the next action will execute, and will stop executing actions from this call. If 
+	 * the driver is dead, then its dead action will execute, and no further actions will be executed.
 	 * @param to index in the actions list to perform up to.
 	 * @throws NullPointerException If the current driver is null
 	 * or the actions list is null.
@@ -254,7 +329,11 @@ public class AdvancedActions implements Iterable<AdvancedAction>
 	}
 	
 	/**
-	 * Performs actions from a given index and up to another index (exclusive).
+	 * Performs actions from a given index and up to another index (exclusive). If 
+	 * it is currently interrupted, it will attempt to run its interrupt action. If 
+	 * it is running through actions and gets interrupted, it will run its interrupt action 
+	 * before the next action will execute, and will stop executing actions from this call. If 
+	 * the driver is dead, then its dead action will execute, and no further actions will be executed.
 	 * @param from index in the actions list to start performing actions
 	 * @param to index in the actions list to perform up to
 	 * @throws IndexOutOfBoundsException If the given indexes are out
@@ -266,6 +345,17 @@ public class AdvancedActions implements Iterable<AdvancedAction>
 	 */
 	public void perform(int from, int to) throws IndexOutOfBoundsException, IllegalArgumentException, NullPointerException
 	{
+		if(deadAction != null && DriverUser.isDriverDead(driver))
+		{
+			deadAction.run();
+			return;
+		}
+		if(interrupted)
+		{
+			interruptAction.run();
+			uninterrupt();
+			return;
+		}
 		if(driver == null || actions == null)
 			throw new NullPointerException();
 		if(from < 0 || from >= actions.size())
@@ -285,6 +375,23 @@ public class AdvancedActions implements Iterable<AdvancedAction>
 			AdvancedAction action = listIter.next();
 			try
 			{
+				System.out.println("===================================");
+				System.out.println("Doing an action");
+				System.out.println("===================================");
+				System.out.println("Are we interrupted?: " + interrupted);
+				if(deadAction != null && DriverUser.isDriverDead(driver))
+				{
+					lastFailedAction = action;
+					deadAction.run();
+					return;
+				}
+				if(interrupted)
+				{
+					lastFailedAction = action;
+					interruptAction.run();
+					uninterrupt();
+					return;
+				}
 				action.perform();
 			}
 			catch(org.openqa.selenium.WebDriverException e)

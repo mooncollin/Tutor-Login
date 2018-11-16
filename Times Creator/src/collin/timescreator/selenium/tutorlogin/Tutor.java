@@ -12,6 +12,7 @@ import collin.timescreator.selenium.utils.ClickAction;
 import collin.timescreator.selenium.utils.DriverUser;
 import collin.timescreator.selenium.utils.KeysAction;
 import collin.timescreator.selenium.utils.WaitAction;
+import collin.timescreator.util.Procedure;
 
 /**
  * Allows for interacting with the CSLC tutoring portal.
@@ -86,6 +87,20 @@ public class Tutor extends DriverUser
 		setUsername(usernameIn);
 		setPassword(passwordIn);
 		setEmail(emailIn);
+	}
+	
+	@Override
+	public void setDeadProcedure(Procedure action)
+	{
+		super.setDeadProcedure(action);
+		TUTOR_WORKING_PROCESS.setDeadAction(action);
+	}
+	
+	@Override
+	public void setInterruptProcedure(Procedure action)
+	{
+		super.setInterruptProcedure(action);
+		TUTOR_WORKING_PROCESS.setInterruptAction(action);
 	}
 	
 	/**
@@ -344,5 +359,10 @@ public class Tutor extends DriverUser
 	{
 		super.setDriver();
 		TUTOR_WORKING_PROCESS.setDriver(driver, true);
+	}
+	
+	public void interrupt()
+	{
+		TUTOR_WORKING_PROCESS.interrupt();
 	}
 }

@@ -12,6 +12,7 @@ import collin.timescreator.selenium.utils.ClickAction;
 import collin.timescreator.selenium.utils.DriverUser;
 import collin.timescreator.selenium.utils.KeysAction;
 import collin.timescreator.selenium.utils.WaitAction;
+import collin.timescreator.util.Procedure;
 import collin.timescreator.util.Shift;
 
 /**
@@ -96,6 +97,20 @@ public class TrueYou extends DriverUser
 		((KeysAction) FIREFLY_UPLOAD_PROCESS.findActionWithBy(By.id("username"), KeysAction.class)).setKeys(String.valueOf(this.NUID));
 	}
 	
+	@Override
+	public void setDeadProcedure(Procedure action)
+	{
+		super.setDeadProcedure(action);
+		FIREFLY_UPLOAD_PROCESS.setDeadAction(action);
+	}
+	
+	@Override
+	public void setInterruptProcedure(Procedure action)
+	{
+		super.setInterruptProcedure(action);
+		FIREFLY_UPLOAD_PROCESS.setInterruptAction(action);
+	}
+	
 	/**
 	 * Sets the password.
 	 * @param password password to set.
@@ -151,8 +166,6 @@ public class TrueYou extends DriverUser
 		driver.switchTo().defaultContent();
 		driver.switchTo().frame("Neptune");
 		FIREFLY_UPLOAD_PROCESS.perform(4, FIREFLY_UPLOAD_PROCESS.size());
-		
-		
 		
 		for(int h = 0; h < FIREFLY_ROWS_BY_DAY.length; h++)
 		{
@@ -240,5 +253,14 @@ public class TrueYou extends DriverUser
 	{
 		super.setDriver();
 		FIREFLY_UPLOAD_PROCESS.setDriver(driver, true);
+	}
+	
+	/**
+	 * Interrupts this DriverUser. This will interrupt its process, so that when another action 
+	 * is attempted, it will instead be interrupted and run its iterrupt procedure.
+	 */
+	public void interrupt()
+	{
+		FIREFLY_UPLOAD_PROCESS.interrupt();
 	}
 }

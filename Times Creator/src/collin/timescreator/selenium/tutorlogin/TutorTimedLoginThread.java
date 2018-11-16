@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.Locale;
 
 import collin.timescreator.selenium.utils.BrowserType;
-import collin.timescreator.selenium.utils.DetectDeadDriverThread;
+import collin.timescreator.selenium.utils.DeadDriverException;
+import collin.timescreator.selenium.utils.DriverInterruptedException;
 import collin.timescreator.selenium.utils.DriverThread;
-import collin.timescreator.util.Procedure;
 import collin.timescreator.util.Shift;
 import javafx.application.Platform;
 import javafx.scene.control.TextArea;
@@ -24,10 +24,6 @@ import javafx.scene.control.TextArea;
  */
 public class TutorTimedLoginThread extends DriverThread<Tutor>
 {
-	/**
-	 * A function to run when this threads needs to stop.
-	 */
-	private final Procedure resetProcedure;
 	
 	/**
 	 * The shift data.
@@ -48,22 +44,12 @@ public class TutorTimedLoginThread extends DriverThread<Tutor>
 	 * @param tutorLoginController the controller creating this thread
 	 * @param dayData shift data
 	 */
-	public TutorTimedLoginThread(Procedure givenProcedure, 
-			HashMap<String, List<Shift>> dayData, TextArea loginOutput,
+	public TutorTimedLoginThread(HashMap<String, List<Shift>> dayData, TextArea loginOutput,
 			String emailIn, String netIDIn, String passwordIn, BrowserType type)
 	{
 		super(new Tutor(netIDIn, passwordIn, emailIn, type));
-		deadThread = new DetectDeadDriverThread<Tutor>(this);
-		this.resetProcedure = givenProcedure;
 		this.loginOutput = loginOutput;
 		this.dayData = dayData;
-	}
-	
-	protected void reset()
-	{
-		deadThread.stopThread();
-		getDriverUser().closeDriver();
-		resetProcedure.run();
 	}
 	
 	/**
@@ -100,14 +86,11 @@ public class TutorTimedLoginThread extends DriverThread<Tutor>
 		{
 			if(isInterrupted())
 				throw new InterruptedException();
-			deadThread.start();
 			if(!credentialsCheck())
 			{
 				reset();
 				return;
 			}
-			deadThread.stopThread();
-			deadThread = new DetectDeadDriverThread<Tutor>(this);
 			while(true)
 			{
 				if(isInterrupted())
@@ -136,10 +119,7 @@ public class TutorTimedLoginThread extends DriverThread<Tutor>
 						loginOutput.appendText("Time to work!\n");
 						if(isInterrupted())
 							throw new InterruptedException();
-						deadThread.start();
 						getDriverUser().working(true);
-						deadThread.stopThread();
-						deadThread = new DetectDeadDriverThread<Tutor>(this);
 						now = LocalDateTime.now();
 						later = LocalDateTime.of(LocalDate.now(), shift.getStop());
 						waitDuration = Duration.between(now, later);
@@ -148,10 +128,7 @@ public class TutorTimedLoginThread extends DriverThread<Tutor>
 						loginOutput.appendText("Time to leave work!\n");
 						if(isInterrupted())
 							throw new InterruptedException();
-						deadThread.start();
 						getDriverUser().working(false);
-						deadThread.stopThread();
-						deadThread = new DetectDeadDriverThread<Tutor>(this);
 					}
 				}
 				if(noShifts)
@@ -168,7 +145,7 @@ public class TutorTimedLoginThread extends DriverThread<Tutor>
 				Thread.sleep(waitDuration.toMillis());
 			}
 		}
-		catch(org.openqa.selenium.WebDriverException e)
+		catch(org.openqa.selenium.WebDriverException | DeadDriverException | DriverInterruptedException e)
 		{
 			reset();
 			Platform.runLater(() ->
