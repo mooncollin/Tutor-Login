@@ -375,10 +375,6 @@ public class AdvancedActions implements Iterable<AdvancedAction>
 			AdvancedAction action = listIter.next();
 			try
 			{
-				System.out.println("===================================");
-				System.out.println("Doing an action");
-				System.out.println("===================================");
-				System.out.println("Are we interrupted?: " + interrupted);
 				if(deadAction != null && DriverUser.isDriverDead(driver))
 				{
 					lastFailedAction = action;

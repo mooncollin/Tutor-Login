@@ -32,6 +32,8 @@ public class TrueYou extends DriverUser
 	 */
 	private static final String FIREFLY_URL = "https://firefly.nebraska.edu/irj/portal/";
 	
+	private static final By TIME_TEXTBOX_BY = By.xpath("//tr/td/div/input[@role='combobox']");
+	
 	/**
 	 * The default amount of seconds to wait for WaitActions.
 	 */
@@ -171,7 +173,7 @@ public class TrueYou extends DriverUser
 		{
 			for(int i = 1; i < data.get(FIREFLY_ROWS_BY_DAY[h]).size(); i++)
 			{
-				driver.findElements(By.cssSelector("button[title='Add']")).get(h).click();;
+				driver.findElements(By.cssSelector("button[title='Add']")).get(h).click();
 			}
 		}
 		
@@ -183,25 +185,24 @@ public class TrueYou extends DriverUser
 		for(int i = 0; i < rows.size(); i++)
 		{
 			if(data.get(FIREFLY_ROWS_BY_DAY[dayOfWeek]).size() != 0)
-			{	
-				List<WebElement> inputs = driver.findElements(By.xpath("//tr/td/div/input[@role='combobox']"));
-				
-				inputs.get(i * 3 + 1).click();
+			{
+				String startTime = String.valueOf(data.get(FIREFLY_ROWS_BY_DAY[dayOfWeek]).get(counter - 1).getStart());
+				String endTime = String.valueOf(data.get(FIREFLY_ROWS_BY_DAY[dayOfWeek]).get(counter - 1).getStop());
+				List<WebElement> inputs = driver.findElements(TIME_TEXTBOX_BY);
 
-				inputs = driver.findElements(By.xpath("//tr/td/div/input[@role='combobox']"));
+				inputs.get(i * 3 + 1).click();
+				inputs = driver.findElements(TIME_TEXTBOX_BY);
 				
 				inputs.get(i * 3 + 1)
-					.sendKeys(String.valueOf(data.get(FIREFLY_ROWS_BY_DAY[dayOfWeek]).get(counter - 1).getStart()));
+					.sendKeys(startTime);
+				
+				inputs = driver.findElements(TIME_TEXTBOX_BY);
 
-				inputs = driver.findElements(By.xpath("//tr/td/div/input[@role='combobox']"));
-				
 				inputs.get(i * 3 + 2).click();
-				
-				inputs = driver.findElements(By.xpath("//tr/td/div/input[@role='combobox']"));
+				inputs = driver.findElements(TIME_TEXTBOX_BY);
 				
 				inputs.get(i * 3 + 2)
-					.sendKeys(String.valueOf(data.get(FIREFLY_ROWS_BY_DAY[dayOfWeek]).get(counter - 1).getStop()));
-				
+					.sendKeys(endTime);
 			}
 			if(counter >= data.get(FIREFLY_ROWS_BY_DAY[dayOfWeek]).size())
 			{
