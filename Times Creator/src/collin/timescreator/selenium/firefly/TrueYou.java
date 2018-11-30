@@ -37,8 +37,16 @@ public class TrueYou extends DriverUser
 	 */
 	private static final By TIME_TEXTBOX_BY = By.xpath("//tr/td/div/input[@role='combobox']");
 	
+	/**
+	 * Locator for the button for the shift type dropdown menu.
+	 */
 	private static final By SHIFT_TYPE_BUTTON_BY = By.xpath("//tr/td/div/button");
 	
+	/**
+	 * Locator for the first option for the shift type dropdown menu.
+	 * This will apparently only work if its corresponding dropdown 
+	 * button has previously been clicked.
+	 */
 	private static final By SHIFT_TYPE_OPTION_BY = By.xpath("//li[text()='Tmp/Std Work Hours']");
 	
 	/**
