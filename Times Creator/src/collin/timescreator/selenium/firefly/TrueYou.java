@@ -32,7 +32,14 @@ public class TrueYou extends DriverUser
 	 */
 	private static final String FIREFLY_URL = "https://firefly.nebraska.edu/irj/portal/";
 	
+	/**
+	 * Locator for the time textfields on the Firefly timesheet.
+	 */
 	private static final By TIME_TEXTBOX_BY = By.xpath("//tr/td/div/input[@role='combobox']");
+	
+	private static final By SHIFT_TYPE_BUTTON_BY = By.xpath("//tr/td/div/button");
+	
+	private static final By SHIFT_TYPE_OPTION_BY = By.xpath("//li[text()='Tmp/Std Work Hours']");
 	
 	/**
 	 * The default amount of seconds to wait for WaitActions.
@@ -149,6 +156,7 @@ public class TrueYou extends DriverUser
 	 * website.
 	 * @param data shift data to put into the website.
 	 * @return true if successful, false otherwise.
+	 * @throws InterruptedException 
 	 */
 	public boolean uploadHours(Map<String, List<Shift>> data)
 	{
@@ -182,12 +190,29 @@ public class TrueYou extends DriverUser
 		
 		int counter = 1;
 		int dayOfWeek = 0;
+		int amountMade = 0;
 		for(int i = 0; i < rows.size(); i++)
 		{
 			if(data.get(FIREFLY_ROWS_BY_DAY[dayOfWeek]).size() != 0)
 			{
 				String startTime = String.valueOf(data.get(FIREFLY_ROWS_BY_DAY[dayOfWeek]).get(counter - 1).getStart());
 				String endTime = String.valueOf(data.get(FIREFLY_ROWS_BY_DAY[dayOfWeek]).get(counter - 1).getStop());
+				List<WebElement> buttons = driver.findElements(SHIFT_TYPE_BUTTON_BY);
+				buttons.forEach(System.out::println);
+				buttons.get(i).click();
+				try
+				{
+					Thread.sleep(250);
+				}
+				catch(InterruptedException e)
+				{
+					return false;
+				}
+				List<WebElement> firstWorkType = driver.findElements(SHIFT_TYPE_OPTION_BY);
+				firstWorkType.forEach(System.out::println);
+				firstWorkType.get(amountMade++).click();
+				
+				
 				List<WebElement> inputs = driver.findElements(TIME_TEXTBOX_BY);
 
 				inputs.get(i * 3 + 1).click();
