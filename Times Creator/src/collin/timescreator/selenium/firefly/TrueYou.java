@@ -211,7 +211,6 @@ public class TrueYou extends DriverUser
 				String startTime = String.valueOf(data.get(FIREFLY_ROWS_BY_DAY[dayOfWeek]).get(counter - 1).getStart());
 				String endTime = String.valueOf(data.get(FIREFLY_ROWS_BY_DAY[dayOfWeek]).get(counter - 1).getStop());
 				List<WebElement> checkboxes = driver.findElements(WORKLIST_CHECKBOX_BY);
-				checkboxes.forEach(System.out::println);
 				checkboxes.get(i).click();
 				List<WebElement> buttons = driver.findElements(SHIFT_TYPE_BUTTON_BY);
 				buttons.get(i).click();
@@ -225,7 +224,6 @@ public class TrueYou extends DriverUser
 				}
 				List<WebElement> firstWorkType = driver.findElements(SHIFT_TYPE_OPTION_BY);
 				firstWorkType.get(amountMade++).click();
-				
 				
 				List<WebElement> inputs = driver.findElements(TIME_TEXTBOX_BY);
 
