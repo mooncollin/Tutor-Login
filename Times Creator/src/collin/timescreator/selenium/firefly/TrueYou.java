@@ -84,15 +84,15 @@ public class TrueYou extends DriverUser
 	 * The Firefly process actions chain.
 	 */
 	private final AdvancedActions FIREFLY_UPLOAD_PROCESS = AdvancedActions.of(
-			new KeysAction(null, By.id("username"), null), // Enter NUID
-			new KeysAction(null, By.id("password"), null), // Enter Password
-			new ClickAction(null, By.cssSelector("button[class='button success']")), // Click login button
-			new WaitAction(null, By.name("Neptune"), DEFAULT_WAITING_SECONDS), // Wait for Firefly main page
-			new WaitAction(null, By.xpath("//div[starts-with(@aria-label, 'Employee Self Service')]"), DEFAULT_WAITING_SECONDS), // Wait for ESS box
-			new ClickAction(null, By.xpath("//div[starts-with(@aria-label, 'Employee Self Service')]")), // Click ESS box
-			new WaitAction(null, By.xpath("//div[starts-with(@aria-label, 'Timesheet Entry')]"), DEFAULT_WAITING_SECONDS), // Wait for Timesheet Entry Box
-			new ClickAction(null, By.xpath("//div[starts-with(@aria-label, 'Timesheet Entry')]")), // Click Timesheet Entry Box
-			new WaitAction(null, By.id("__jsview1--tableTime-listUl"), DEFAULT_WAITING_SECONDS) // Wait for hours table
+		new KeysAction(null, By.id("username"), null), // Enter NUID
+		new KeysAction(null, By.id("password"), null), // Enter Password
+		new ClickAction(null, By.cssSelector("button[class='button success']")), // Click login button
+		new WaitAction(null, By.name("Neptune"), DEFAULT_WAITING_SECONDS), // Wait for Firefly main page
+		new WaitAction(null, By.xpath("//div[starts-with(@aria-label, 'Employee Self Service')]"), DEFAULT_WAITING_SECONDS), // Wait for ESS box
+		new ClickAction(null, By.xpath("//div[starts-with(@aria-label, 'Employee Self Service')]")), // Click ESS box
+		new WaitAction(null, By.xpath("//div[starts-with(@aria-label, 'Timesheet Entry')]"), DEFAULT_WAITING_SECONDS), // Wait for Timesheet Entry Box
+		new ClickAction(null, By.xpath("//div[starts-with(@aria-label, 'Timesheet Entry')]")), // Click Timesheet Entry Box
+		new WaitAction(null, By.id("__jsview1--tableTime-listUl"), DEFAULT_WAITING_SECONDS) // Wait for hours table
 	);
 	
 	/**

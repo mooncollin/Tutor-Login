@@ -48,7 +48,7 @@ public class MainController
 	/**
 	 * Responsible for easy saving and loading files.
 	 */
-	private static final FileChooser fileChooser = new FileChooser();
+	private final FileChooser fileChooser = new FileChooser();
 	
 	/**
 	 * The number of gridpanes on the main window. One for each
@@ -288,7 +288,7 @@ public class MainController
 		}
 		
 		fileChooser.setTitle("Save Schedule File");
-		File outputFile = fileChooser.showSaveDialog(null);
+		File outputFile = fileChooser.showSaveDialog(this.stage);
 		
 		try
 		{
@@ -311,7 +311,7 @@ public class MainController
 	public void loadFile(ActionEvent event)
 	{
 		fileChooser.setTitle("Open Schedule File");
-		File selectedFile = fileChooser.showOpenDialog(null);
+		File selectedFile = fileChooser.showOpenDialog(this.stage);
 		if(selectedFile != null)
 		{
 			fillShifts(selectedFile);
