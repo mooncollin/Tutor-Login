@@ -50,9 +50,14 @@ public class TrueYou extends DriverUser
 	private static final By SHIFT_TYPE_OPTION_BY = By.xpath("//li[text()='Tmp/Std Work Hours']");
 	
 	/**
+	 * Locator for the worklist checkboxes.
+	 */
+	private static final By WORKLIST_CHECKBOX_BY = By.xpath("//td/div/div/div");
+	
+	/**
 	 * The default amount of seconds to wait for WaitActions.
 	 */
-	private static final int DEFAULT_WAITING_SECONDS = 10;
+	private static final int DEFAULT_WAITING_SECONDS = 25;
 	
 	/**
 	 * An array of string that are in the order of how
@@ -205,8 +210,10 @@ public class TrueYou extends DriverUser
 			{
 				String startTime = String.valueOf(data.get(FIREFLY_ROWS_BY_DAY[dayOfWeek]).get(counter - 1).getStart());
 				String endTime = String.valueOf(data.get(FIREFLY_ROWS_BY_DAY[dayOfWeek]).get(counter - 1).getStop());
+				List<WebElement> checkboxes = driver.findElements(WORKLIST_CHECKBOX_BY);
+				checkboxes.forEach(System.out::println);
+				checkboxes.get(i).click();
 				List<WebElement> buttons = driver.findElements(SHIFT_TYPE_BUTTON_BY);
-				buttons.forEach(System.out::println);
 				buttons.get(i).click();
 				try
 				{
@@ -217,7 +224,6 @@ public class TrueYou extends DriverUser
 					return false;
 				}
 				List<WebElement> firstWorkType = driver.findElements(SHIFT_TYPE_OPTION_BY);
-				firstWorkType.forEach(System.out::println);
 				firstWorkType.get(amountMade++).click();
 				
 				
