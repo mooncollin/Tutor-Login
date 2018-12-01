@@ -346,6 +346,7 @@
                   </Menu>
                   <Menu mnemonicParsing="false" text="Help">
                     <items>
+                        <MenuItem mnemonicParsing="false" onAction="#tutorialMenu" text="Tutorial" />
                       <MenuItem mnemonicParsing="false" onAction="#aboutMenu" text="About" />
                     </items>
                   </Menu>

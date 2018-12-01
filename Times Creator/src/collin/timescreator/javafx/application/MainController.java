@@ -52,7 +52,7 @@ public class MainController
 	
 	/**
 	 * The number of gridpanes on the main window. One for each
-	 * day of the month.
+	 * day of the week.
 	 */
 	private static final int NUMBER_OF_GRIDPANES = 7;
 	
@@ -97,7 +97,7 @@ public class MainController
 	/**
 	 * The custom panes list.
 	 */
-	private static final List<ShiftPane> panes = new ArrayList<ShiftPane>(NUMBER_OF_GRIDPANES);
+	private final List<ShiftPane> panes = new ArrayList<ShiftPane>(NUMBER_OF_GRIDPANES);
 	
 	/**
 	 * Stage for the tutor login scene.
@@ -113,6 +113,11 @@ public class MainController
 	 * Stage for the firefly scene;
 	 */
 	private Stage fireflyStage;
+	
+	/**
+	 * Stage for the tutorial scene;
+	 */
+	private Stage tutorialStage;
 	
 	/**
 	 * A string to keep hold of the email to load it back 
@@ -132,8 +137,14 @@ public class MainController
 	 */
 	private String tutorPassword;
 	
+	/**
+	 * The user's NUID for their Firefly login.
+	 */
 	private int fireflyNUID;
 	
+	/**
+	 * The user's password for their Firefly login.
+	 */
 	private String fireflyPassword;
 	
 	/**
@@ -152,6 +163,8 @@ public class MainController
 			}
 			if(aboutStage != null)
 			{
+				if(aboutStage.getOnCloseRequest() != null)
+					aboutStage.getOnCloseRequest().handle(null);
 				aboutStage.close();
 			}
 			if(fireflyStage != null)
@@ -159,6 +172,12 @@ public class MainController
 				if(fireflyStage.getOnCloseRequest() != null)
 					fireflyStage.getOnCloseRequest().handle(null);
 				fireflyStage.close();
+			}
+			if(tutorialStage != null)
+			{
+				if(tutorialStage.getOnCloseRequest() != null)
+					tutorialStage.getOnCloseRequest().handle(null);
+				tutorialStage.close();
 			}
 		});
 		tutorEmail = "";
@@ -177,9 +196,14 @@ public class MainController
 		fireflyStage.setTitle("Firefly Upload Hours");
 		fireflyStage.setResizable(false);
 		
+		tutorialStage = new Stage();
+		tutorialStage.setTitle("Tutorial");
+		tutorialStage.setResizable(false);
+		
 		fileChooser.getExtensionFilters().addAll(filter);
 		
 		fireflyNUID = -1;
+		fireflyPassword = "";
 	}
 	
 	/**
@@ -322,16 +346,7 @@ public class MainController
 			return;
 		}
 		var shifts = createShifts();
-		boolean allEmpty = true;
-		for(String key : shifts.keySet())
-		{
-			if(!shifts.get(key).isEmpty())
-			{
-				allEmpty = false;
-				break;
-			}
-		}
-		if(allEmpty)
+		if(isShiftsEmpty(shifts))
 		{
 			Main.alert(NO_TIMES_ENTERED, AlertType.ERROR);
 			return;
@@ -369,8 +384,8 @@ public class MainController
 	/**
 	 * The firefly feature implements this onAction method.
 	 * It will show the firefly scene.
-	 * @param event An ActionEvent for a node.
-	 * @throws IOException if it cannot find the Firefly.fxml resource.
+	 * @param event An ActionEvent for a node
+	 * @throws IOException if it cannot find the Firefly.fxml resource
 	 */
 	@FXML
 	private void fireflyMenu(ActionEvent event) throws IOException
@@ -382,16 +397,7 @@ public class MainController
 			return;
 		}
 		var shifts = createShifts();
-		boolean allEmpty = true;
-		for(String key : shifts.keySet())
-		{
-			if(!shifts.get(key).isEmpty())
-			{
-				allEmpty = false;
-				break;
-			}
-		}
-		if(allEmpty)
+		if(isShiftsEmpty(shifts))
 		{
 			Main.alert(NO_TIMES_ENTERED, AlertType.ERROR);
 			return;
@@ -408,6 +414,21 @@ public class MainController
 			fireflyNUID = controller.getNUID();
 			fireflyPassword = controller.getPassword();
 		});
+	}
+	
+	/**
+	 * The tutorial feature implements this onAction method.
+	 * It will show the tutorial scene.
+	 * @param event An ActionEvent for a node
+	 * @throws IOException if it cannot find the Tutorials.fxml resource
+	 */
+	@FXML
+	private void tutorialMenu(ActionEvent event) throws IOException
+	{
+		TutorialController controller = new TutorialController();
+		Scene scene = SceneUtils.loadScene(this.getClass(), controller, Main.TUTORIAL_FXML, Main.MAIN_CSS);
+		tutorialStage.setScene(scene);
+		tutorialStage.show();
 	}
 	
 	/**
@@ -502,6 +523,25 @@ public class MainController
 		}
 		
 		return ShiftCompare.CORRECT;
+	}
+	
+	/**
+	 * Checks whether all the current shifts are empty or not.
+	 * @param shifts a hashmap whose keys are days of the week and 
+	 * values are a list of shifts for that day
+	 * @return true if all shifts are empty, false otherwise
+	 */
+	private boolean isShiftsEmpty(HashMap<String, List<Shift>> shifts)
+	{
+		for(String key : shifts.keySet())
+		{
+			if(!shifts.get(key).isEmpty())
+			{
+				return false;
+			}
+		}
+		
+		return true;
 	}
 	
 	/**

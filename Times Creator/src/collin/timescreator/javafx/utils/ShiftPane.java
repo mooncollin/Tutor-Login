@@ -116,8 +116,15 @@ public class ShiftPane
 				}
 				if(hourAndMinute.length > 1)
 				{
-					int minute = Integer.valueOf(hourAndMinute[1]);
-					if(minute < 0 || minute > 59)
+					try
+					{
+						int minute = Integer.valueOf(hourAndMinute[1]);
+						if(minute < 0 || minute > 59)
+						{
+							result = null;
+						}
+					}
+					catch(NumberFormatException e)
 					{
 						result = null;
 					}

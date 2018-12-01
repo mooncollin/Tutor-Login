@@ -38,6 +38,11 @@ public class Main extends Application
 	public static final String FIREFLY_FXML = "/collin/timescreator/javafx/resources/fxml/Firefly.fxml";
 	
 	/**
+	 * Tutorials window FXML file.
+	 */
+	public static final String TUTORIAL_FXML = "/collin/timescreator/javafx/resources/fxml/Tutorials.fxml";
+	
+	/**
 	 * If a non-user error occurs, this will be the default error message shown to the user.
 	 */
 	public static final String DEFAULT_ERROR_MESSAGE = "Oops! Something went wrong. Go to the 'About' section and contact the owner.";
