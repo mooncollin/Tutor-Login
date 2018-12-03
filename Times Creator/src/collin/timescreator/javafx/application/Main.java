@@ -61,13 +61,39 @@ public class Main extends Application
 	 */
 	private static final boolean DEBUG_MODE = false;
 	
+	/**
+	 * The root directory for installing the webdrivers.
+	 */
 	public static final Path WEBDRIVER_ROOT_DIRECTORY = Paths.get(System.getenv("SystemDrive"), "TimesCreator");
+	
+	/**
+	 * The path for the Firefox webdriver.
+	 */
 	public static final Path FIREFOX_WEBDRIVER_PATH = Paths.get(WEBDRIVER_ROOT_DIRECTORY.toString(), "geckodriver.exe");
+	
+	/**
+	 * The path for the Chrome webdriver.
+	 */
 	public static final Path CHROME_WEBDRIVER_PATH = Paths.get(WEBDRIVER_ROOT_DIRECTORY.toString(), "chromedriver.exe");
+	
+	/**
+	 * The path for the Opera webdriver.
+	 */
 	public static final Path OPERA_WEBDRIVER_PATH = Paths.get(WEBDRIVER_ROOT_DIRECTORY.toString(), "operadriver.exe");
 	
+	/**
+	 * The location of the Firefox Geckodriver.
+	 */
 	private static final String FIREFOX_DRIVER = "/collin/timescreator/resources/webdriver/geckodriver.exe";
+	
+	/**
+	 * The location of the Chrome driver.
+	 */
 	private static final String CHROME_DRIVER = "/collin/timescreator/resources/webdriver/chromedriver.exe";
+	
+	/**
+	 * The location of the Opera driver.
+	 */
 	private static final String OPERA_DRIVER = "/collin/timescreator/resources/webdriver/operadriver.exe";
 	
 	/**
