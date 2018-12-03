@@ -1,6 +1,9 @@
 package collin.timescreator.javafx.application;
 	
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import collin.timescreator.javafx.utils.SceneUtils;
@@ -20,27 +23,27 @@ public class Main extends Application
 	/**
 	 * Main FXML file that will be the first window shown.
 	 */
-	public static final String MAIN_FXML = "/collin/timescreator/javafx/resources/fxml/Layout.fxml";
+	public static final String MAIN_FXML = "/collin/timescreator/resources/fxml/Layout.fxml";
 	
 	/**
 	 * Tutor Login window FXML file.
 	 */
-	public static final String TUTOR_LOGIN_FXML = "/collin/timescreator/javafx/resources/fxml/TutorLoginLayout.fxml";
+	public static final String TUTOR_LOGIN_FXML = "/collin/timescreator/resources/fxml/TutorLoginLayout.fxml";
 	
 	/**
 	 * About window FXML file.
 	 */
-	public static final String ABOUT_FXML = "/collin/timescreator/javafx/resources/fxml/About.fxml";
+	public static final String ABOUT_FXML = "/collin/timescreator/resources/fxml/About.fxml";
 	
 	/**
 	 * Firefly window FXML file.
 	 */
-	public static final String FIREFLY_FXML = "/collin/timescreator/javafx/resources/fxml/Firefly.fxml";
+	public static final String FIREFLY_FXML = "/collin/timescreator/resources/fxml/Firefly.fxml";
 	
 	/**
 	 * Tutorials window FXML file.
 	 */
-	public static final String TUTORIAL_FXML = "/collin/timescreator/javafx/resources/fxml/Tutorials.fxml";
+	public static final String TUTORIAL_FXML = "/collin/timescreator/resources/fxml/Tutorials.fxml";
 	
 	/**
 	 * If a non-user error occurs, this will be the default error message shown to the user.
@@ -50,13 +53,22 @@ public class Main extends Application
 	/**
 	 * List of main CSS files.
 	 */
-	public static final List<String> MAIN_CSS = List.of("/collin/timescreator/javafx/resources/css/application.css");
+	public static final List<String> MAIN_CSS = List.of("/collin/timescreator/resources/css/application.css");
 	
 	/**
 	 * A flag to set whether debug mode should be on. This enables logging for various
 	 * exceptions and disables the default error alert.
 	 */
 	private static final boolean DEBUG_MODE = false;
+	
+	public static final Path WEBDRIVER_ROOT_DIRECTORY = Paths.get(System.getenv("SystemDrive"), "TimesCreator");
+	public static final Path FIREFOX_WEBDRIVER_PATH = Paths.get(WEBDRIVER_ROOT_DIRECTORY.toString(), "geckodriver.exe");
+	public static final Path CHROME_WEBDRIVER_PATH = Paths.get(WEBDRIVER_ROOT_DIRECTORY.toString(), "chromedriver.exe");
+	public static final Path OPERA_WEBDRIVER_PATH = Paths.get(WEBDRIVER_ROOT_DIRECTORY.toString(), "operadriver.exe");
+	
+	private static final String FIREFOX_DRIVER = "/collin/timescreator/resources/webdriver/geckodriver.exe";
+	private static final String CHROME_DRIVER = "/collin/timescreator/resources/webdriver/chromedriver.exe";
+	private static final String OPERA_DRIVER = "/collin/timescreator/resources/webdriver/operadriver.exe";
 	
 	/**
 	 * Sets up the controller and the scene associated with MAIN_FXML
@@ -66,6 +78,7 @@ public class Main extends Application
 	@Override
 	public void start(Stage primaryStage)
 	{
+		setup();
 		MainController controller = new MainController(primaryStage);
 		Scene mainScene;
 		try
@@ -91,8 +104,52 @@ public class Main extends Application
 	}
 	
 	/**
+	 * Installs required WebDriver executables for Selenium.
+	 */
+	private void setup()
+	{
+		try
+		{
+			if(!Files.isDirectory(WEBDRIVER_ROOT_DIRECTORY))
+			{
+				Files.createDirectory(WEBDRIVER_ROOT_DIRECTORY);
+			}
+			if(!Files.exists(FIREFOX_WEBDRIVER_PATH))
+			{
+				Files.write(FIREFOX_WEBDRIVER_PATH, getClass().getResourceAsStream(FIREFOX_DRIVER).readAllBytes());
+			}
+			if(!Files.exists(CHROME_WEBDRIVER_PATH))
+			{
+				Files.write(CHROME_WEBDRIVER_PATH, getClass().getResourceAsStream(CHROME_DRIVER).readAllBytes());
+			}
+			if(!Files.exists(OPERA_WEBDRIVER_PATH))
+			{
+				Files.write(OPERA_WEBDRIVER_PATH, getClass().getResourceAsStream(OPERA_DRIVER).readAllBytes());
+			}
+		}
+		catch(IOException | SecurityException e)
+		{
+			alert("Error installing WebDriver. Please check folder permissions.", Alert.AlertType.ERROR);
+			System.exit(1);
+		}
+		
+		try
+		{
+			System.setProperty("webdriver.gecko.driver", FIREFOX_WEBDRIVER_PATH.toString());
+			System.setProperty("webdriver.chrome.driver", CHROME_WEBDRIVER_PATH.toString());
+			System.setProperty("webdriver.opera.driver", OPERA_WEBDRIVER_PATH.toString());
+		}
+		catch(SecurityException e)
+		{
+			alert("Error isntalling WebDriver. Please check your system property permissions.", Alert.AlertType.ERROR);
+			System.exit(1);
+		}
+	}
+	
+	/**
 	 * Launches the application.
 	 * @param args not used.
+	 * @throws IOException 
 	 */
 	public static void main(String[] args) {
 		launch(args);

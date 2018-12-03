@@ -4,6 +4,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.opera.OperaDriver;
 import org.openqa.selenium.safari.SafariDriver;
@@ -178,6 +179,9 @@ abstract public class DriverUser
 				break;
 			case SAFARI:
 				driver = new SafariDriver();
+				break;
+			case HTMLUNIT:
+				driver = new HtmlUnitDriver();
 				break;
 			default:
 				driver = new ChromeDriver();

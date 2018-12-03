@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<HBox prefHeight="500.0" prefWidth="515.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <VBox fx:id="linksContainer" spacing="10.0">
+         <children>
+            <Hyperlink fx:id="welcomeLink" minHeight="-Infinity" minWidth="-Infinity" onAction="#select" onMouseEntered="#mouseOverLink" onMouseExited="#mouseExitLink" styleClass="selected_hyperlink" text="Welcome" />
+            <Hyperlink minHeight="-Infinity" minWidth="-Infinity" onAction="#select" onMouseEntered="#mouseOverLink" onMouseExited="#mouseExitLink" styleClass="unselected_hyperlink" text="Loading a File" />
+            <Hyperlink minHeight="-Infinity" minWidth="-Infinity" onAction="#select" onMouseEntered="#mouseOverLink" onMouseExited="#mouseExitLink" styleClass="unselected_hyperlink" text="Saving a File" />
+            <Hyperlink minHeight="-Infinity" minWidth="-Infinity" onAction="#select" onMouseEntered="#mouseOverLink" onMouseExited="#mouseExitLink" styleClass="unselected_hyperlink" text="Putting in data" />
+            <Hyperlink minHeight="-Infinity" minWidth="-Infinity" onAction="#select" onMouseEntered="#mouseOverLink" onMouseExited="#mouseExitLink" styleClass="unselected_hyperlink" text="Tutor Login" />
+            <Hyperlink minHeight="-Infinity" minWidth="-Infinity" onAction="#select" onMouseEntered="#mouseOverLink" onMouseExited="#mouseExitLink" styleClass="unselected_hyperlink" text="Firefly Hours" />
+         </children>
+         <HBox.margin>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </HBox.margin></VBox>
+      <Separator orientation="VERTICAL" prefHeight="200.0" />
+      <BorderPane prefHeight="490.0" prefWidth="400.0">
+         <bottom>
+            <Pagination fx:id="pagination" pageCount="1" BorderPane.alignment="CENTER">
+               <BorderPane.margin>
+                  <Insets />
+               </BorderPane.margin></Pagination>
+         </bottom>
+         <padding>
+            <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+         </padding>
+         <center>
+            <VBox alignment="CENTER" BorderPane.alignment="CENTER">
+               <children>
+                  <ImageView fx:id="imageView" fitWidth="350.0" pickOnBounds="true" preserveRatio="true" styleClass="shadow_border" />
+                  <Label fx:id="helpText" alignment="CENTER" contentDisplay="CENTER">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                     <VBox.margin>
+                        <Insets top="5.0" />
+                     </VBox.margin>
+                  </Label>
+               </children>
+            </VBox>
+         </center>
+      </BorderPane>
+   </children>
+</HBox>
