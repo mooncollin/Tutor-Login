@@ -10,6 +10,7 @@ import collin.timescreator.selenium.utils.DriverInterruptedException;
 import collin.timescreator.selenium.utils.DriverThread;
 import collin.timescreator.util.Shift;
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
 /**
@@ -58,6 +59,13 @@ public class FireflyThread extends DriverThread<TrueYou>
 		catch(org.openqa.selenium.WebDriverException | DeadDriverException | DriverInterruptedException e)
 		{
 			result = LOGIN_RESULT.ERROR; // Driver was closed during the process
+		}
+		catch(IllegalStateException e)
+		{
+			result = LOGIN_RESULT.ERROR;
+			Platform.runLater(() -> {
+				Main.alert("WebDrivers do not exist.\nPlease restart the program to reinstall drivers.", Alert.AlertType.ERROR);
+			});
 		}
 		if(result == LOGIN_RESULT.ERROR)
 		{

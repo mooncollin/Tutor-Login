@@ -155,7 +155,7 @@ public class Main extends Application
 		}
 		catch(IOException | SecurityException e)
 		{
-			alert("Error installing WebDriver. Please check folder permissions.", Alert.AlertType.ERROR);
+			alert("Error installing WebDrivers. Please check folder permissions.", Alert.AlertType.ERROR);
 			System.exit(1);
 		}
 		
@@ -167,7 +167,7 @@ public class Main extends Application
 		}
 		catch(SecurityException e)
 		{
-			alert("Error isntalling WebDriver. Please check your system property permissions.", Alert.AlertType.ERROR);
+			alert("Error installing WebDrivers. Please check your system property permissions.", Alert.AlertType.ERROR);
 			System.exit(1);
 		}
 	}

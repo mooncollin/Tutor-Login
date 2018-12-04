@@ -9,12 +9,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import collin.timescreator.javafx.application.Main;
 import collin.timescreator.selenium.utils.BrowserType;
 import collin.timescreator.selenium.utils.DeadDriverException;
 import collin.timescreator.selenium.utils.DriverInterruptedException;
 import collin.timescreator.selenium.utils.DriverThread;
 import collin.timescreator.util.Shift;
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TextArea;
 
 /**
@@ -155,6 +157,13 @@ public class TutorTimedLoginThread extends DriverThread<Tutor>
 		}
 		catch(InterruptedException e)
 		{
+			reset();
+		}
+		catch(IllegalStateException e)
+		{
+			Platform.runLater(() -> {
+				Main.alert("WebDrivers do not exist.\nPlease restart the program to reinstall drivers.", Alert.AlertType.ERROR);
+			});
 			reset();
 		}
 	}
