@@ -142,7 +142,7 @@ public class TutorTimedLoginThread extends DriverThread<Tutor>
 					loginOutput.appendText("We are done with the day\n");
 				}
 				now = LocalDateTime.now();
-				later = LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.MIDNIGHT);
+				later = LocalDateTime.of(LocalDate.now().plusDays(1), LocalTime.MIDNIGHT).plusSeconds(5); // Give a little time in the day
 				waitDuration = Duration.between(now, later);
 				Thread.sleep(waitDuration.toMillis());
 			}
