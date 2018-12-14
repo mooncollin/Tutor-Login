@@ -155,6 +155,10 @@ public class MainController
 	{
 		setStage(stage);
 		this.stage.setOnCloseRequest(e -> {
+			if(Main.loggingThread != null)
+			{
+				Main.loggingThread.interrupt();
+			}
 			if(tutorLoginStage != null)
 			{
 				if(tutorLoginStage.getOnCloseRequest() != null)

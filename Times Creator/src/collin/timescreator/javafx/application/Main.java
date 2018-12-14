@@ -7,6 +7,8 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import collin.timescreator.javafx.utils.SceneUtils;
+import collin.timescreator.util.LogLevel;
+import collin.timescreator.util.LoggingThread;
 import javafx.application.Application;
 import javafx.stage.Stage;
 import javafx.scene.Scene;
@@ -59,7 +61,7 @@ public class Main extends Application
 	 * A flag to set whether debug mode should be on. This enables logging for various
 	 * exceptions and disables the default error alert.
 	 */
-	private static final boolean DEBUG_MODE = false;
+	public static final boolean DEBUG_MODE = true;
 	
 	/**
 	 * The root directory for installing the webdrivers.
@@ -80,6 +82,11 @@ public class Main extends Application
 	 * The path for the Opera webdriver.
 	 */
 	public static final Path OPERA_WEBDRIVER_PATH = Paths.get(WEBDRIVER_ROOT_DIRECTORY.toString(), "operadriver.exe");
+	
+	/**
+	 * A thread to manage logging.
+	 */
+	public static final LoggingThread loggingThread = new LoggingThread();
 	
 	/**
 	 * The location of the Firefox Geckodriver.
@@ -104,6 +111,7 @@ public class Main extends Application
 	@Override
 	public void start(Stage primaryStage)
 	{
+		loggingThread.start();
 		setup();
 		MainController controller = new MainController(primaryStage);
 		Scene mainScene;
@@ -111,11 +119,11 @@ public class Main extends Application
 		{
 			mainScene = SceneUtils.loadScene(Main.class, controller, MAIN_FXML, MAIN_CSS);
 		}
-		catch(IOException e)
+		catch(Exception e)
 		{
 			if(DEBUG_MODE)
 			{
-				e.printStackTrace();
+				log(e.getMessage(), LogLevel.DANGER);
 			}
 			else
 			{
@@ -191,5 +199,15 @@ public class Main extends Application
 	{
 		Alert alert = new Alert(type, message);
 		alert.show();
+	}
+	
+	/**
+	 * Adds to the logging system a log to eventually print to stdout.
+	 * @param message the message to log
+	 * @param level the level of concern
+	 */
+	public static void log(String message, LogLevel level)
+	{
+		loggingThread.getLogger().log(message, level);
 	}
 }

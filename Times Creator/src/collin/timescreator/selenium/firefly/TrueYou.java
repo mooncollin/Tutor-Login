@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 import collin.timescreator.selenium.utils.AdvancedAction;
 import collin.timescreator.selenium.utils.AdvancedActions;
@@ -35,12 +36,12 @@ public class TrueYou extends DriverUser
 	/**
 	 * Locator for the time textfields on the Firefly timesheet.
 	 */
-	private static final By TIME_TEXTBOX_BY = By.xpath("//tr/td/div/input[@role='combobox']");
+	private static final By TIME_TEXTBOX_BY = By.xpath("//tr/td/div/div/input[@aria-type='Time input']");
 	
 	/**
 	 * Locator for the button for the shift type dropdown menu.
 	 */
-	private static final By SHIFT_TYPE_BUTTON_BY = By.xpath("//tr/td/div/button");
+	private static final By SHIFT_TYPE_BUTTON_BY = By.xpath("//tr/td/div[@role='combobox']/span");
 	
 	/**
 	 * Locator for the first option for the shift type dropdown menu.
@@ -52,7 +53,7 @@ public class TrueYou extends DriverUser
 	/**
 	 * Locator for the worklist checkboxes.
 	 */
-	private static final By WORKLIST_CHECKBOX_BY = By.xpath("//td/div/div/div");
+	private static final By WORKLIST_CHECKBOX_BY = By.xpath("//td/div[@role='checkbox']");
 	
 	/**
 	 * The default amount of seconds to wait for WaitActions.
@@ -226,20 +227,34 @@ public class TrueYou extends DriverUser
 				firstWorkType.get(amountMade++).click();
 				
 				List<WebElement> inputs = driver.findElements(TIME_TEXTBOX_BY);
-
-				inputs.get(i * 3 + 1).click();
-				inputs = driver.findElements(TIME_TEXTBOX_BY);
 				
-				inputs.get(i * 3 + 1)
-					.sendKeys(startTime);
+				Actions action = new Actions(driver);
+				boolean firstEquals = inputs.get(i * 2).getAttribute("value").equals(startTime);
+				boolean secondEquals = inputs.get(i * 2 + 1).getAttribute("value").equals(endTime);
 				
-				inputs = driver.findElements(TIME_TEXTBOX_BY);
-
-				inputs.get(i * 3 + 2).click();
-				inputs = driver.findElements(TIME_TEXTBOX_BY);
-				
-				inputs.get(i * 3 + 2)
-					.sendKeys(endTime);
+				while(!firstEquals || !secondEquals)
+				{
+					if(!firstEquals)
+					{
+						action.sendKeys(inputs.get(i * 2), startTime).perform();
+					}
+					else
+					{
+						inputs.get(i * 2).click();
+					}
+					inputs = driver.findElements(TIME_TEXTBOX_BY);
+					if(!secondEquals)
+					{
+						action.sendKeys(inputs.get(i * 2 + 1), endTime).perform();
+					}
+					else
+					{
+						inputs.get(i * 2 + 1).click();
+					}
+					inputs = driver.findElements(TIME_TEXTBOX_BY);
+					firstEquals = inputs.get(i * 2).getAttribute("value").equals(startTime);
+					secondEquals = inputs.get(i * 2 + 1).getAttribute("value").equals(endTime);
+				}
 			}
 			if(counter >= data.get(FIREFLY_ROWS_BY_DAY[dayOfWeek]).size())
 			{
