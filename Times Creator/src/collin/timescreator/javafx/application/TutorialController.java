@@ -56,11 +56,11 @@ public class TutorialController
 	 */
 	private static final String[][] IMAGES = {
 			{null},
-			{"/collin/timescreator/javafx/resources/images/LoadFile1.png", "/collin/timescreator/javafx/resources/images/LoadFile2.png", "/collin/timescreator/javafx/resources/images/LoadFile3.JPG"},
-			{"/collin/timescreator/javafx/resources/images/SaveFile1.JPG", "/collin/timescreator/javafx/resources/images/SaveFile2.png"},
-			{"/collin/timescreator/javafx/resources/images/DataInput1.JPG", "/collin/timescreator/javafx/resources/images/DataInput2.JPG", "/collin/timescreator/javafx/resources/images/DataInput3.JPG", "/collin/timescreator/javafx/resources/images/DataInput4.JPG"},
-			{"/collin/timescreator/javafx/resources/images/SaveFile1.JPG", "/collin/timescreator/javafx/resources/images/Tutor1.JPG", "/collin/timescreator/javafx/resources/images/Tutor2.JPG", "/collin/timescreator/javafx/resources/images/Tutor3.JPG", "/collin/timescreator/javafx/resources/images/Tutor4.JPG"},
-			{"/collin/timescreator/javafx/resources/images/SaveFile1.JPG", "/collin/timescreator/javafx/resources/images/Firefly1.JPG", "/collin/timescreator/javafx/resources/images/Firefly2.JPG", "/collin/timescreator/javafx/resources/images/Firefly3.JPG", "/collin/timescreator/javafx/resources/images/Firefly4.JPG"}
+			{"/collin/timescreator/resources/images/LoadFile1.png", "/collin/timescreator/resources/images/LoadFile2.png", "/collin/timescreator/resources/images/LoadFile3.JPG"},
+			{"/collin/timescreator/resources/images/SaveFile1.JPG", "/collin/timescreator/resources/images/SaveFile2.png"},
+			{"/collin/timescreator/resources/images/DataInput1.JPG", "/collin/timescreator/resources/images/DataInput2.JPG", "/collin/timescreator/resources/images/DataInput3.JPG", "/collin/timescreator/resources/images/DataInput4.JPG"},
+			{"/collin/timescreator/resources/images/SaveFile1.JPG", "/collin/timescreator/resources/images/Tutor1.JPG", "/collin/timescreator/resources/images/Tutor2.JPG", "/collin/timescreator/resources/images/Tutor3.JPG", "/collin/timescreator/resources/images/Tutor4.JPG"},
+			{"/collin/timescreator/resources/images/SaveFile1.JPG", "/collin/timescreator/resources/images/Firefly1.JPG", "/collin/timescreator/resources/images/Firefly2.JPG", "/collin/timescreator/resources/images/Firefly3.JPG", "/collin/timescreator/resources/images/Firefly4.JPG"}
 	};
 	
 	/**
